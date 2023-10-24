@@ -1,5 +1,7 @@
 asgiref==3.7.2
 Django==3.2.22
+django-phonenumber-field==7.2.0
+phonenumbers==8.13.23
 pytz==2023.3.post1
 sqlparse==0.4.4
-typing-extensions==4.7.1
+typing_extensions==4.7.1
