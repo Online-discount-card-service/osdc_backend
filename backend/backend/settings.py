@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'core',
-    'users',
+    'users.apps.UsersConfig',
+    'phonenumber_field',
 ]
 
 MEDIA_URL = '/media/'
@@ -68,6 +69,7 @@ DATABASES = {
     }
 }
 
+#AUTH_USER_MODEL = 'users.User'
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

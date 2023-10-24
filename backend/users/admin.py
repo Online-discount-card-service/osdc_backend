@@ -1,11 +1,16 @@
 from django.contrib import admin
-from .models import User
 
+from users.models import User
+
+
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'date_joined', 'is_active')
-    list_filter = ('is_active', 'date_joined')
-    search_fields = ('email', 'first_name', 'last_name')
+    list_display = (
+        'email',
+        'username',
+        'date_joined',
+        'phone_number',
+        )
+    list_filter = ('date_joined',)
+    search_fields = ('email', 'username',)
     ordering = ('-date_joined',)
-
-
-admin.site.register(User, UserAdmin)
