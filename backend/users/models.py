@@ -17,19 +17,12 @@ class User(AbstractUser):
         },
         help_text=_('Укажите свой email'),
     )
-    # При необходимости раздельного хранения имени и Фамили
-    # first_name = models.CharField(max_length=MAX_LENGTH_NAME, blank=True, verbose_name="Имя")
-    # last_name = models.CharField(max_length=MAX_LENGTH_NAME, blank=True, verbose_name="Фамилия")
     username = models.CharField(
         verbose_name=_("Ваше имя"),
         unique=True,
         blank=True,
         max_length=MAX_LENGTH_NAME,
         help_text=_('Укажите свое имя'),
-    )
-    date_joined = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_("Дата регистрации")
     )
     phone_number = PhoneNumberField(
         region="RU",
