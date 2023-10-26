@@ -1,6 +1,9 @@
 name: osdc_backend workflow
 
-on: workflow_dispatch
+on: 
+  push:
+    branches:
+      - cicd
 
 jobs:
   tests:
