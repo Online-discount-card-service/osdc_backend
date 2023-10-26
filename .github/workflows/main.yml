@@ -56,30 +56,40 @@ jobs:
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.PASSWORD }}
+        username: ${{ secrets.USER2 }}
+        password: ${{ secrets.PASSWORD2 }}
         source: "infra/docker-compose.yml"
-        target: "/home/backend"
+        target: "backend"
     - name: Copy nginx.conf via ssh
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.PASSWORD }}
+        username: ${{ secrets.USER2 }}
+        password: ${{ secrets.PASSWORD2 }}
         source: "infra/nginx.conf"
-        target: "/home/backend"
+        target: "backend"
     - name: Executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.PASSWORD }}
+        username: ${{ secrets.USER2 }}
+        password: ${{ secrets.PASSWORD2 }}
         script: |
-          cd /home/backend/infra
-          sudo docker compose -f docker-compose.yml down
+          cd backend/infra
+          sudo docker compose down
           sudo docker system prune --all --force
-          sudo docker compose -f docker-compose.yml up -d
-          sudo docker compose -f docker-compose.yml exec django python manage.py migrate
+          sudo rm .env
+          touch .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo POSTGRES_USER=${{ secrets.POSTGRES_DB }} >> .env
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          sudo docker compose up -d
+          sudo docker compose exec django python manage.py migrate
+          sudo docker compose exec django python manage.py collectstatic
+          udo docker compose exec django cp -r /app/collected_static/. ../backend_static/static/
           
   send_message:
     runs-on: ubuntu-latest

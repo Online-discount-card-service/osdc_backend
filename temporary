@@ -1,3 +1,0 @@
-sudo docker compose -f docker-compose.yml exec django python manage.py migrate
-          sudo docker compose -f docker-compose.yml exec django python manage.py collectstatic
-          sudo docker compose -f docker-compose.yml exec django cp -r /app/collected_static/. ../backend_static/static/
