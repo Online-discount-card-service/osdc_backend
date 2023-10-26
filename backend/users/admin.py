@@ -10,7 +10,7 @@ class UserAdmin(admin.ModelAdmin):
         'username',
         'date_joined',
         'phone_number',
-        )
+    )
     list_filter = ('date_joined',)
     search_fields = ('email', 'username',)
     ordering = ('-date_joined',)

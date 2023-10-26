@@ -1,6 +1,5 @@
 from djoser.views import UserViewSet
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly)
 
 
 class UserViewSet(UserViewSet):
