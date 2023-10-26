@@ -80,7 +80,7 @@ jobs:
           sudo docker system prune --all --force
           sudo rm .env
           touch .env
-          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo SECRET_KEY="${{ secrets.SECRET_KEY }}" >> .env
           echo POSTGRES_USER=${{ secrets.POSTGRES_DB }} >> .env
           echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
           echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
