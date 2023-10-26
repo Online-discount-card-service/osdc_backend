@@ -8,13 +8,13 @@ volumes:
 services:
   db:
     image: postgres:14.9-alpine
-    env_file: .env
+    env_file: ./.env
     volumes:
       - pg_data:/var/lib/postgresql/data
 
   django:
     image: guestagain/osdc_backend
-    env_file: .env
+    env_file: ./.env
     depends_on:
       - db
     volumes:
