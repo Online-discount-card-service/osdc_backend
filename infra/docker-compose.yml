@@ -12,14 +12,14 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
-  # django:
-  #   image: guestagain/osdc_backend
-  #   env_file: /home/backend/.env
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - static:/backend_static
-  #     - media:/media
+  django:
+    image: guestagain/osdc_backend
+    env_file: /home/backend/.env
+    depends_on:
+      - db
+    volumes:
+      - static:/backend_static
+      - media:/media
 
   # nginx:
   #   image: nginx:1.24.0
