@@ -56,26 +56,26 @@ jobs:
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.PASSWORD }}
+        username: ${{ secrets.USER2 }}
+        password: ${{ secrets.PASSWORD2 }}
         source: "infra/docker-compose.yml"
         target: "backend"
     - name: Copy nginx.conf via ssh
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.PASSWORD }}
+        username: ${{ secrets.USER2 }}
+        password: ${{ secrets.PASSWORD2 }}
         source: "infra/nginx.conf"
         target: "backend"
     - name: Executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        password: ${{ secrets.PASSWORD }}
+        username: ${{ secrets.USER2 }}
+        password: ${{ secrets.PASSWORD2 }}
         script: |
-          cd backend/infra         
+          cd backend/infra
           sudo docker compose -f docker-compose.yml down
           sudo docker system prune --all --force
           sudo docker compose -f docker-compose.yml up -d
