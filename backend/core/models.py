@@ -39,6 +39,10 @@ class Shop(models.Model):
         verbose_name='Лого магазина',
         help_text='Загрузите логотип магазина'
     )
+    group = models.ManyToManyField(
+        Group,
+        verbose_name='Категории'
+    )
 
     class Meta:
         ordering = ('name',)
