@@ -89,3 +89,36 @@ class Card(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Favourites(models.Model):
+    """Класс предназначет для хранения в бд списка избраных
+    карт пользователя"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_favourites',
+        verbose_name='Пользователь'
+    )
+    card = models.ForeignKey(
+        Card,
+        on_delete=models.CASCADE,
+        related_name='card_favourites'
+    )
+
+    class Meta:
+        onstraints = (
+            models.UniqueConstraint(
+                fields=[
+                    'user',
+                    'card'
+                ],
+                name='uniq_favorites'
+            ),
+        )
+        verbose_name = 'Список избранного'
+        verbose_name_plural = 'Список избранного'
+        ordering = ('user',)
+
+    def __str__(self):
+        return f'{self.card} в списке избранного пользователя {self.user}'
