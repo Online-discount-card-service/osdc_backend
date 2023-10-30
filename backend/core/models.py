@@ -11,11 +11,10 @@ class Shop(models.Model):
         verbose_name='Название магазина',
         help_text='Введите название магазина'
     )
-    slug = models.SlugField(
-        unique=True,
-        max_length=50,
-        verbose_name='Индентификатор магазина',
-        help_text='Введите индентификатор магазина'
+    logo = models.ImageField(
+        upload_to='shop/',
+        verbose_name='Лого магазина',
+        help_text='Загрузите логотип магазина'
     )
 
     class Meta:
@@ -44,10 +43,16 @@ class Card(models.Model):
         verbose_name='Дата добовления карты',
         auto_now_add=True,
     )
-    image = models.ImageField(
+    image_card = models.ImageField(
         upload_to='card/',
         verbose_name='Изображение карты',
         help_text='Загрузите изображение'
+    )
+    image_gtin = models.ImageField(
+        upload_to='gtin/',
+        verbose_name='Изображение штрих-кода',
+        help_text='Загрузите изображение штрих-кода',
+        blank=True
     )
 
     class Meta:
