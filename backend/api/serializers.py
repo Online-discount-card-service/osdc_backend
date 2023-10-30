@@ -27,4 +27,4 @@ class UserCreateSerializer(UserCreateSerializer):
             'username',
             'phone_number',
             'password'
-            )
+        )

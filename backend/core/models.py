@@ -27,7 +27,7 @@ class Shop(models.Model):
         return self.name
 
 
-class Card(models.models.Model):
+class Card(models.Model):
     """Класс предназначен для создания карты пользователя в бд"""
     owner = models.ForeignKey(
         User,
