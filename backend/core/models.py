@@ -4,6 +4,29 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+class Group(models.Model):
+    """Данный класс предназначен для создания в бд категорий"""
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название категории',
+        help_text='Введите название категории'
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        verbose_name='Индентификатор категории',
+        help_text='Введите индентификатор категории'
+    )
+
+    class Meta:
+        verbose_name = 'Категория',
+        verbose_name_plural = 'Категории'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
 class Shop(models.Model):
     """Клас предназначен для создания в бд перечня магазинов"""
     name = models.CharField(
