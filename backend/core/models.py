@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from users.consts import (MAX_LENGTH_CARD_NAME,
-                          MAX_LENGTH_GROUP_NAME,
-                          MAX_LENGTH_SHOP_NAME)
+from .consts import (MAX_LENGTH_CARD_NAME,
+                     MAX_LENGTH_GROUP_NAME,
+                     MAX_LENGTH_SHOP_NAME)
 
 User = get_user_model()
 
