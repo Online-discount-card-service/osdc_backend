@@ -1,5 +1,7 @@
 # Online-discount-card-service
 
+## https://skidivay.ddns.net/api/
+
 # Инструкция по скачиванию репозитория с GitHub
 
 ## 1. Установка Git 🛠
