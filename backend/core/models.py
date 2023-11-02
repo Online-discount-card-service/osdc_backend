@@ -107,7 +107,7 @@ class Favourites(models.Model):
     )
 
     class Meta:
-        onstraints = (
+        constraints = (
             models.UniqueConstraint(
                 fields=[
                     'user',
