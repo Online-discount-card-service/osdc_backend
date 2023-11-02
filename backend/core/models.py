@@ -1,22 +1,26 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from users.consts import (MAX_LENGTH_CARD_NAME,
+                          MAX_LENGTH_GROUP_NAME,
+                          MAX_LENGTH_SHOP_NAME)
+
 User = get_user_model()
 
 
 class Group(models.Model):
     """Данный класс предназначен для создания в бд категорий"""
     name = models.CharField(
-        max_length=200,
+        max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
         help_text='Введите название категории'
     )
-    slug = models.SlugField(
-        unique=True,
-        max_length=50,
-        verbose_name='Индентификатор категории',
-        help_text='Введите индентификатор категории'
-    )
+    # slug = models.SlugField(
+    #     unique=True,
+    #     max_length=50,
+    #     verbose_name='Индентификатор категории',
+    #     help_text='Введите индентификатор категории'
+    # )
 
     class Meta:
         verbose_name = 'Категория',
@@ -30,7 +34,7 @@ class Group(models.Model):
 class Shop(models.Model):
     """Клас предназначен для создания в бд перечня магазинов"""
     name = models.CharField(
-        max_length=200,
+        max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название магазина',
         help_text='Введите название магазина'
     )
@@ -55,6 +59,11 @@ class Shop(models.Model):
 
 class Card(models.Model):
     """Класс предназначен для создания карты пользователя в бд"""
+    name = models.CharField(
+        max_length=MAX_LENGTH_CARD_NAME,
+        verbose_name='Название магазина',
+        help_text='Введите название магазина'
+    )
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -67,7 +76,7 @@ class Card(models.Model):
         help_text='Выберите магазин'
     )
     pub_date = models.DateTimeField(
-        verbose_name='Дата добовления карты',
+        verbose_name='Дата добавления карты',
         auto_now_add=True,
     )
     image_card = models.ImageField(
@@ -80,6 +89,10 @@ class Card(models.Model):
         verbose_name='Изображение штрих-кода',
         help_text='Загрузите изображение штрих-кода',
         blank=True
+    )
+    group = models.ManyToManyField(
+        Group,
+        verbose_name='Категории'
     )
 
     class Meta:
