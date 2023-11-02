@@ -32,5 +32,5 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet):
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """"""
-    queryset = Shop.objects.all()
+    queryset = Group.objects.all()
     serializer_class = GroupSerializer
