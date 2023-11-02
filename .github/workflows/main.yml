@@ -3,7 +3,7 @@ name: osdc_backend workflow
 on: 
   push:
     branches:
-      - cicd
+      - main
 
 jobs:
   tests:
