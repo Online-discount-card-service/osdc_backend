@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'core',
     'users.apps.UsersConfig',
     'phonenumber_field',
+    'drf_yasg',
 ]
 
 MEDIA_URL = '/media/'
