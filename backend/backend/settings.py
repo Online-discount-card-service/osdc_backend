@@ -154,8 +154,8 @@ DJOSER = {
     'HIDE_USERS': False,
     'SEND_ACTIVATION_EMAIL': True,
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_CONFRIMATION_EMAIL':True,
-    'EMAIL':{
+    'SEND_CONFRIMATION_EMAIL': True,
+    'EMAIL': {
         'activation': 'djoser.email.ActivationEmail',
     },
 }
