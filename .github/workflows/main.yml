@@ -74,8 +74,8 @@ jobs:
         password: ${{ secrets.PASSWORD2 }}
         script: |
           cd backend/infra
-          sudo docker compose down
-          sudo docker system prune --all --force
+          sudo docker-compose stop
+          sudo docker-compose rm django
           sudo rm .env
           touch .env
           echo SECRET_KEY="${{ secrets.SECRET_KEY }}" >> .env
