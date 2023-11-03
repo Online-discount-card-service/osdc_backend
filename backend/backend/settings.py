@@ -152,4 +152,5 @@ DJOSER = {
         'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
     },
     'HIDE_USERS': False,
+    'SEND_ACTIVATION_EMAIL': True,
 }
