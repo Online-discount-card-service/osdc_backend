@@ -74,11 +74,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('POSTGRES_DB', 'osdc'),
-        'USER': os.getenv('POSTGRES_USER', 'osdc'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'osdc_password'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432')
     }
 }
