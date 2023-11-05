@@ -38,7 +38,7 @@ INSTALLED_APPS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join('collected_static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
