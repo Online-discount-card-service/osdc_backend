@@ -32,7 +32,7 @@ class User(AbstractUser):
     first_name = models.CharField(
         verbose_name=_('first name'),
         max_length=MAX_LENGTH_NAME,
-        blank=False
+        blank=True
     )
     phone_number = PhoneNumberField(
         region="RU",
