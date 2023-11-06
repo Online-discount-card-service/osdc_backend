@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
-                     MAX_LENGTH_SHOP_NAME)
+                     MAX_LENGTH_SHOP_NAME, MAX_LENGTH_CARD_NUMBER)
 
 User = get_user_model()
 
@@ -28,8 +28,8 @@ class Shop(models.Model):
     """Клас предназначен для создания в бд перечня магазинов"""
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
-        verbose_name='Название магазина',
-        help_text='Введите название магазина'
+        verbose_name='Название карты',
+        help_text='Назовите карту'
     )
     logo = models.ImageField(
         upload_to='shop/',
@@ -54,8 +54,7 @@ class Card(models.Model):
     """Класс предназначен для создания карты пользователя в бд"""
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
-        blank=True,
-        null=True,
+        blank=False,
         verbose_name='Название магазина',
         help_text='Введите название магазина',
     )
@@ -80,12 +79,19 @@ class Card(models.Model):
     image_card = models.ImageField(
         upload_to='card/',
         verbose_name='Изображение карты',
-        help_text='Загрузите изображение'
+        help_text='Загрузите изображение',
+        blank=True,
     )
-    image_gtin = models.ImageField(
-        upload_to='gtin/',
-        verbose_name='Изображение штрих-кода',
-        help_text='Загрузите изображение штрих-кода',
+    card_number = models.CharField(
+        max_length=MAX_LENGTH_CARD_NUMBER,
+        verbose_name='Номер карты',
+        help_text='Введите номер карты',
+        blank=True
+    )
+    barcode_number = models.CharField(
+        max_length=MAX_LENGTH_CARD_NUMBER,
+        verbose_name='Номер штрих-кода',
+        help_text='Введите номер штрих-кода',
         blank=True
     )
     group = models.ManyToManyField(

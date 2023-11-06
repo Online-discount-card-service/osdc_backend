@@ -74,12 +74,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-"""DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}"""
 
 DATABASES = {
     'default': {
@@ -152,6 +146,7 @@ DJOSER = {
         'user_create': 'api.serializers.UserCreateSerializer',
         'user': 'api.serializers.UserSerializer',
         'current_user': 'api.serializers.UserSerializer',
+        'user_create_password_retype': 'api.serializers.UserCreatePasswordRetypeSerializer',
     },
 
     'PERMISSIONS': {
@@ -163,4 +158,5 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': False,
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_CONFRIMATION_EMAIL': False,
+    'USER_CREATE_PASSWORD_RETYPE': True,
 }
