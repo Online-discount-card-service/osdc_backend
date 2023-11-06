@@ -160,7 +160,7 @@ DJOSER = {
     },
     'HIDE_USERS': False,
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_ACTIVATION_EMAIL': False,
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_CONFRIMATION_EMAIL': True,
+    'SEND_CONFRIMATION_EMAIL': False,
 }
