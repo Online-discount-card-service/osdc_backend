@@ -14,12 +14,6 @@ class Group(models.Model):
         verbose_name='Название категории',
         help_text='Введите название категории'
     )
-    # slug = models.SlugField(
-    #     unique=True,
-    #     max_length=50,
-    #     verbose_name='Индентификатор категории',
-    #     help_text='Введите индентификатор категории'
-    # )
 
     class Meta:
         verbose_name = 'Категория',
