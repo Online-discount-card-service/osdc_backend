@@ -74,6 +74,7 @@ jobs:
         password: ${{ secrets.PASSWORD2 }}
         script: |
           cd backend/infra
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/osdc_backend:latest
           sudo docker-compose stop
           sudo docker-compose rm django
           sudo rm .env
