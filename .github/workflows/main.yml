@@ -90,9 +90,10 @@ jobs:
           echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
           echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env
           echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> .env
-          sudo docker compose up -d --build
+          sudo docker compose up -d
           sudo docker compose exec django python manage.py migrate
-          sudo docker compose exec django python manage.py collectstatic --no-input
+          sudo docker compose exec django python manage.py collectstatic
+          sudo docker compose exec django cp -r /app/collected_static/. ../backend_static/
 
   send_message:
     runs-on: ubuntu-latest
