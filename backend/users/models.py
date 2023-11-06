@@ -3,11 +3,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from users.consts import (MAX_LENGTH_NAME,
-                          LEN_NUMBER,
-                          MAX_LENGTH_EMAIL,
-                          MAX_LENGTH_USERNAME,
-                          MAX_LENGTH_PASSWORD)
+from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME,
+                          MAX_LENGTH_PASSWORD, MAX_LENGTH_USERNAME)
 
 
 class User(AbstractUser):

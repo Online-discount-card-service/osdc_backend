@@ -1,10 +1,11 @@
-from djoser.views import UserViewSet
-from rest_framework.permissions import (IsAuthenticatedOrReadOnly)
-from rest_framework import viewsets
 from django.contrib.auth import get_user_model
+from djoser.views import UserViewSet
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from core.models import Card, Shop, Group
-from .serializers import CardSerializer, ShopSerializer, GroupSerializer
+from core.models import Card, Group, Shop
+
+from .serializers import CardSerializer, GroupSerializer, ShopSerializer
 
 User = get_user_model()
 
