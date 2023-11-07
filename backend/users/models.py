@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME,
                           MAX_LENGTH_PASSWORD, MAX_LENGTH_USERNAME)
+# from core.models import CardQuerySet
 
 
 class User(AbstractUser):
@@ -42,6 +43,8 @@ class User(AbstractUser):
         help_text=_('Введите пароль'),
         max_length=MAX_LENGTH_PASSWORD,
     )
+    # objects отключено пока не решено, при подключении необходимо проверить
+    # objects = CardQuerySet.as_manager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
