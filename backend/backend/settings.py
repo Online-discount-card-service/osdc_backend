@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_FILES_DIR = os.path.join(BASE_DIR, 'data')
+GROUP_FILES_DIR = os.path.join(DATA_FILES_DIR, 'group.csv')
 
 
 SECRET_KEY = 'django-insecure-#pz2&o-&b=q_&e&ws$a$hf-_^c2mv8g79b(xi1(vjntcz=dw3a'
