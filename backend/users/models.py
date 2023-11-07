@@ -21,8 +21,8 @@ class User(AbstractUser):
     )
     username = models.CharField(
         verbose_name=_("Ваше имя"),
-        unique=True,
-        blank=True,
+        unique=False,
+        blank=False,
         max_length=MAX_LENGTH_USERNAME,
         help_text=_('Укажите свое имя'),
     )
@@ -34,13 +34,17 @@ class User(AbstractUser):
     phone_number = PhoneNumberField(
         region="RU",
         max_length=LEN_NUMBER,
-        blank=False
+        blank=False,
+        unique=True
     )
     password = models.CharField(
         verbose_name=_('Пароль'),
         help_text=_('Введите пароль'),
         max_length=MAX_LENGTH_PASSWORD,
     )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = "Пользователь"

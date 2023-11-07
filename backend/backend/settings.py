@@ -74,8 +74,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+"""DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),
         'NAME': os.getenv('POSTGRES_DB'),
@@ -84,7 +90,7 @@ DATABASES = {
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432')
     }
-}
+}"""
 
 AUTH_USER_MODEL = 'users.User'
 AUTH_PASSWORD_VALIDATORS = [
@@ -101,16 +107,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'skidyvaj@yandex.ru'
-EMAIL_HOST_PASSWORD = 'kfhsdosxgmugqcxa'
-EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-SERVER_EMAIL = EMAIL_HOST_USER
-EMAIL_ADMIN = EMAIL_HOST_USER
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# Подключение почтового сервера (временно выключен, на хосте заблокированы SMPT протокол)
+# EMAIL_HOST = os.getenv('EMAIL_HOST')
+# EMAIL_PORT = os.getenv('EMAIL_PORT')
+# EMAIL_HOST_USER = 'os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+# EMAIL_USE_SSL = True
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# SERVER_EMAIL = EMAIL_HOST_USER
+# EMAIL_ADMIN = EMAIL_HOST_USER
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 LANGUAGE_CODE = 'ru'
 
