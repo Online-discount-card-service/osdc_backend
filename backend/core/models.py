@@ -1,5 +1,8 @@
+from typing import Optional
+
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import Exists, OuterRef
 
 from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
                      MAX_LENGTH_SHOP_NAME, MAX_LENGTH_CARD_NUMBER)
@@ -61,7 +64,7 @@ class Card(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='owner',
+        related_name='card',
         verbose_name='Владелец'
     )
     shop = models.ForeignKey(
@@ -139,3 +142,19 @@ class Favourites(models.Model):
 
     def __str__(self):
         return f'{self.card} в списке избранного пользователя {self.user}'
+
+
+class CardQuerySet(models.QuerySet):
+    """Менеджер для выдачи запросов по картам и подпискам с пользователем.
+    Пока не используется"""
+    def add_user_annotations(self, user_id: Optional[int]):
+        return self.annotate(
+            is_favorite=Exists(
+                Favourites.objects.filter(
+                    user_id=user_id, card_id=OuterRef('pk')
+                )
+            ),
+            card=Card.objects.filter(
+                owner_id=user_id
+            )
+        )
