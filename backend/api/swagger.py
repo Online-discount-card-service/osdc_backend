@@ -6,12 +6,12 @@ from django.conf.urls import url
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="OSDC API",
+        title='OSDC API',
         default_version='v1',
-        description="Документация для проекта OSDC",
+        description='Документация для проекта OSDC',
         # terms_of_service="URL страницы с пользовательским соглашением",
-        contact=openapi.Contact(email="admin@admin.ru"),
-        license=openapi.License(name="BSD License"),
+        contact=openapi.Contact(email='admin@admin.ru'),
+        license=openapi.License(name='BSD License'),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
