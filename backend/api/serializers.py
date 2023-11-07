@@ -27,6 +27,10 @@ class UserSerializer(UserSerializer):
 
     class Meta:
         model = User
+        # Выключено пока нет подтверждения что отдаем все при запросе с
+        # пользователем
+        # is_favorite = serializers.BooleanField()
+        # card = serializers.CardSerializer(many=True)
         fields = (
             'id',
             'email',
