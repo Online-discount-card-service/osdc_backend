@@ -1,25 +1,7 @@
-from django.conf.urls import url
-from django.contrib import admin
-from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-
-urlpatterns = [
-    path(
-        'admin/',
-        admin.site.urls
-    ),
-    path(
-        'api/',
-        include('api.urls')
-    ),
-    path(
-        'api/',
-        include('users.urls')
-    ),
-    path('docs/', include('api.swagger')),
-]
+from django.conf.urls import url
 
 
 schema_view = get_schema_view(
@@ -35,7 +17,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-urlpatterns += [
+urlpatterns = [
     url(r'^swagger(?P<format>\.json|\.yaml)$',
         schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
