@@ -65,7 +65,7 @@ class Card(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='card',
+        related_name='cards',
         verbose_name='Владелец'
     )
     shop = models.ForeignKey(
@@ -100,7 +100,8 @@ class Card(models.Model):
     )
     group = models.ManyToManyField(
         Group,
-        verbose_name='Категории'
+        verbose_name='Категории',
+        blank=True
     )
 
     class Meta:
@@ -145,17 +146,17 @@ class Favourites(models.Model):
         return f'{self.card} в списке избранного пользователя {self.user}'
 
 
-class CardQuerySet(models.QuerySet):
-    """Менеджер для выдачи запросов по картам и подпискам с пользователем.
-    Пока не используется"""
-    def add_user_annotations(self, user_id: Optional[int]):
-        return self.annotate(
-            is_favorite=Exists(
-                Favourites.objects.filter(
-                    user_id=user_id, card_id=OuterRef('pk')
-                )
-            ),
-            card=Card.objects.filter(
-                owner_id=user_id
-            )
-        )
+# class CardQuerySet(models.QuerySet):
+#     """Менеджер для выдачи запросов по картам и подпискам с пользователем.
+#     Пока не используется"""
+#     def add_user_annotations(self, user_id: Optional[int]):
+#         return self.annotate(
+#             is_favorite=Exists(
+#                 Favourites.objects.filter(
+#                     user_id=user_id, card_id=OuterRef('pk')
+#                 )
+#             ),
+#             card=Card.objects.filter(
+#                 owner_id=user_id
+#             )
+#         )

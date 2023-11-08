@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
 
 from core.models import Card, Group, Shop
 
@@ -14,6 +15,14 @@ class UserViewSet(UserViewSet):
     """Набор представлений для просмотра и редактирования
     пользовательских экземпляров."""
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    @action(["get", "patch"], detail=False)
+    def me(self, request, *args, **kwargs):
+        self.get_object = self.get_instance
+        if request.method == "GET":
+            return self.retrieve(request, *args, **kwargs)
+        elif request.method == "PATCH":
+            return self.partial_update(request, *args, **kwargs)
 
 
 class CardViewSet(viewsets.ModelViewSet):

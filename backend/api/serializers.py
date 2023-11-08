@@ -21,39 +21,6 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class UserSerializer(UserSerializer):
-    """Класс реализует серилизацию и десерилизацию данных
-    о пользователях"""
-
-    class Meta:
-        model = User
-        # Выключено пока нет подтверждения что отдаем все при запросе с
-        # пользователем
-        # is_favorite = serializers.BooleanField()
-        # card = serializers.CardSerializer(many=True)
-        fields = (
-            'id',
-            'email',
-            'username',
-            'phone_number',
-
-        )
-
-
-class UserCustomCreateSerializer(UserCreateSerializer):
-    """ Класс реализует серилизацию и десерилизацию данных
-    для регистрации новых пользователей"""
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'email',
-            'username',
-            'phone_number',
-            'password'
-        )
-
-
 class GroupSerializer(serializers.ModelSerializer):
     """ Класс реализует серилизацию и десерилизацию данных
     для Категорий"""
@@ -78,8 +45,10 @@ class ShopSerializer(serializers.ModelSerializer):
 class CardSerializer(serializers.ModelSerializer):
     """ """
     owner = UserSerializer(read_only=True)
-    shop = serializers.StringRelatedField()
+    shop = serializers.PrimaryKeyRelatedField(
+        queryset=Shop.objects.all(), required=False)
     image_card = Base64ImageField(required=False)
+
 
     class Meta:
         model = Card
@@ -104,3 +73,77 @@ class CardSerializer(serializers.ModelSerializer):
         instance.shop = validated_data.get('shop', instance.shop)
         instance.save()
         return instance
+    
+    def to_representation(self, instance):
+        return CardReadSerializer(
+            instance,
+            context={'request': self.context.get('request')}
+        ).data
+
+
+class CardReadSerializer(serializers.ModelSerializer):
+    shop = ShopSerializer()
+
+    class Meta:
+        model = Card
+        fields = (
+            'id',
+            'name',
+            'shop',
+            'image_card',
+            'card_number',
+            'barcode_number',
+            'group'
+        )
+
+
+class CardForUserSerializer(serializers.ModelSerializer):
+    """ """
+    shop = serializers.PrimaryKeyRelatedField(
+        queryset=Shop.objects.all())
+
+    class Meta:
+        model = Card
+        fields = (
+            'id',
+            'name',
+            'shop',
+            'image_card',
+            'card_number',
+            'barcode_number',
+            'group'
+        )
+
+class UserCustomCreateSerializer(UserCreateSerializer):
+    """ Класс реализует серилизацию и десерилизацию данных
+    для регистрации новых пользователей"""
+    
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'username',
+            'phone_number',
+            'password'
+        )
+
+
+class UserReadSerializer(UserSerializer):
+    """Класс реализует серилизацию и десерилизацию данных
+    о пользователях"""
+    cards = CardForUserSerializer(many=True)
+
+    class Meta:
+        model = User
+        # Выключено пока нет подтверждения что отдаем все при запросе с
+        # пользователем
+        # is_favorite = serializers.BooleanField()
+        # card = serializers.CardSerializer(many=True)
+        fields = (
+            'id',
+            'email',
+            'username',
+            'phone_number',
+            'cards'
+        )
