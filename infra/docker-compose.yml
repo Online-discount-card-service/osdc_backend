@@ -11,16 +11,15 @@ services:
     env_file: ./.env
     volumes:
       - pg_data:/var/lib/postgresql/data
-
   django:
     image: guestagain/osdc_backend
+    restart: always
     env_file: ./.env
     depends_on:
       - db
     volumes:
       - static:/backend_static
       - media:/media
-
   nginx:
     image: nginx:1.24.0
     ports:

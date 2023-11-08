@@ -1,8 +1,8 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
+from core.models import Card, Group, Shop
 from users.models import User
-from core.models import Card, Shop, Group
 
 
 class UserSerializer(UserSerializer):

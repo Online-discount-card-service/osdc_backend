@@ -1,8 +1,7 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 
-from .consts import (MAX_LENGTH_CARD_NAME,
-                     MAX_LENGTH_GROUP_NAME,
+from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
                      MAX_LENGTH_SHOP_NAME)
 
 User = get_user_model()
@@ -15,12 +14,6 @@ class Group(models.Model):
         verbose_name='Название категории',
         help_text='Введите название категории'
     )
-    # slug = models.SlugField(
-    #     unique=True,
-    #     max_length=50,
-    #     verbose_name='Индентификатор категории',
-    #     help_text='Введите индентификатор категории'
-    # )
 
     class Meta:
         verbose_name = 'Категория',
@@ -61,8 +54,10 @@ class Card(models.Model):
     """Класс предназначен для создания карты пользователя в бд"""
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
+        blank=True,
+        null=True,
         verbose_name='Название магазина',
-        help_text='Введите название магазина'
+        help_text='Введите название магазина',
     )
     owner = models.ForeignKey(
         User,
@@ -70,10 +65,13 @@ class Card(models.Model):
         related_name='owner',
         verbose_name='Владелец'
     )
-    shop = models.ManyToManyField(
+    shop = models.ForeignKey(
         Shop,
+        on_delete=models.SET_NULL,
         verbose_name='Магазин',
-        help_text='Выберите магазин'
+        help_text='Выберите магазин',
+        blank=True,
+        null=True
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата добавления карты',
