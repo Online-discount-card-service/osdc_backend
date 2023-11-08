@@ -58,8 +58,9 @@ class Card(models.Model):
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
         blank=False,
-        verbose_name='Название магазина',
-        help_text='Введите название магазина',
+        verbose_name='Название карты',
+        help_text='Введите название карты',
+        unique=True
     )
     owner = models.ForeignKey(
         User,

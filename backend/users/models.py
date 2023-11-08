@@ -27,11 +27,7 @@ class User(AbstractUser):
         max_length=MAX_LENGTH_USERNAME,
         help_text=_('Укажите свое имя'),
     )
-    first_name = models.CharField(
-        verbose_name=_('first name'),
-        max_length=MAX_LENGTH_NAME,
-        blank=True
-    )
+
     phone_number = PhoneNumberField(
         region="RU",
         max_length=LEN_NUMBER,

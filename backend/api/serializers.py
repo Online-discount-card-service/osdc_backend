@@ -93,3 +93,14 @@ class CardSerializer(serializers.ModelSerializer):
             'barcode_number',
             'group'
         )
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.image_card = validated_data.get('image_card', instance.image_card)
+        instance.card_number = validated_data.get(
+            'card_number', instance.card_number
+            )
+        instance.barcode_number = validated_data.get('barcode_number', instance.barcode_number)
+        instance.shop = validated_data.get('shop', instance.shop)
+        instance.save()
+        return instance
