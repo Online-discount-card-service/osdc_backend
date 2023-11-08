@@ -10,7 +10,7 @@ from users.models import User
 
 class Base64ImageField(serializers.ImageField):
     """
-    Кастмное поле для изображений.
+    Кастомное поле для изображений.
     """
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
@@ -36,6 +36,7 @@ class UserSerializer(UserSerializer):
             'email',
             'username',
             'phone_number',
+
         )
 
 
@@ -54,7 +55,8 @@ class UserCustomCreateSerializer(UserCreateSerializer):
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    """ """
+    """ Класс реализует серилизацию и десерилизацию данных
+    для Категорий"""
 
     class Meta:
         model = Group
@@ -77,7 +79,7 @@ class CardSerializer(serializers.ModelSerializer):
     """ """
     owner = UserSerializer(read_only=True)
     shop = serializers.StringRelatedField()
-    image_card = Base64ImageField()
+    image_card = Base64ImageField(required=False)
 
     class Meta:
         model = Card
