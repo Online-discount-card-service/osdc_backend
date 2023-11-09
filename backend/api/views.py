@@ -11,6 +11,7 @@ from .serializers import CardSerializer, GroupSerializer, ShopSerializer
 User = get_user_model()
 
 
+# Переопределила страницу users/me, чтобы убрать лишние методы PUT и DELETE
 class UserViewSet(UserViewSet):
     """Набор представлений для просмотра и редактирования
     пользовательских экземпляров."""

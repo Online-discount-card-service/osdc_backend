@@ -97,6 +97,7 @@ class CardReadSerializer(serializers.ModelSerializer):
         )
 
 
+# Сериализатор для отображения данных карт при запросе на эндпоинт api/users
 class CardForUserSerializer(serializers.ModelSerializer):
     """ """
     shop = serializers.PrimaryKeyRelatedField(
