@@ -49,7 +49,6 @@ class CardSerializer(serializers.ModelSerializer):
         queryset=Shop.objects.all(), required=False)
     image_card = Base64ImageField(required=False)
 
-
     class Meta:
         model = Card
         fields = (
@@ -73,7 +72,7 @@ class CardSerializer(serializers.ModelSerializer):
         instance.shop = validated_data.get('shop', instance.shop)
         instance.save()
         return instance
-    
+
     def to_representation(self, instance):
         return CardReadSerializer(
             instance,
@@ -115,10 +114,11 @@ class CardForUserSerializer(serializers.ModelSerializer):
             'group'
         )
 
+
 class UserCustomCreateSerializer(UserCreateSerializer):
     """ Класс реализует серилизацию и десерилизацию данных
     для регистрации новых пользователей"""
-    
+
     class Meta:
         model = User
         fields = (
@@ -133,7 +133,7 @@ class UserCustomCreateSerializer(UserCreateSerializer):
 class UserReadSerializer(UserSerializer):
     """Класс реализует серилизацию и десерилизацию данных
     о пользователях"""
-    cards = CardForUserSerializer(many=True)
+    # cards = CardForUserSerializer(many=True)
 
     class Meta:
         model = User
