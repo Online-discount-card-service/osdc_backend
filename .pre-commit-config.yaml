@@ -1,0 +1,39 @@
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.5.0
+      hooks:
+          - id: trailing-whitespace
+          - id: check-yaml
+          - id: check-added-large-files
+          - id: check-merge-conflict
+
+    - repo: https://github.com/ambv/black
+      rev: 23.10.1
+      hooks:
+        - id: black
+          exclude: (migrations|settings.py)
+          args: [--diff]
+
+    - repo: https://github.com/pycqa/flake8
+      rev: 6.1.0
+      hooks:
+        - id: flake8
+          exclude: (migrations|settings.py)
+          additional_dependencies:
+            - flake8-docstrings
+
+    - repo: https://github.com/pycqa/isort
+      rev: 5.12.0
+      hooks:
+          - id: isort
+            exclude: migrations
+            args: [ --profile, black, --line-length=79 ]
+
+    - repo: local
+      hooks:
+          - id: export-requirements
+            name: Export requirements.txt
+            language: system
+            pass_filenames: false
+            entry: poetry export --without-hashes --output backend/requirements.txt
+            files: ^(pyproject.toml|poetry.lock)$
