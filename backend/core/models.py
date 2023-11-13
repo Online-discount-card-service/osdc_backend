@@ -1,11 +1,17 @@
-from typing import Optional
+# from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Exists, OuterRef
+# from django.db.models import Exists, OuterRef
 
-from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
-                     MAX_LENGTH_SHOP_NAME, MAX_LENGTH_CARD_NUMBER)
+from .consts import (
+    MAX_LENGTH_CARD_NAME,
+    MAX_LENGTH_COLOR,
+    MAX_LENGTH_GROUP_NAME,
+    MAX_LENGTH_SHOP_NAME,
+    MAX_LENGTH_CARD_NUMBER
+)
+from .validators import validate_color_format
 
 User = get_user_model()
 
@@ -34,14 +40,25 @@ class Shop(models.Model):
         verbose_name='Название карты',
         help_text='Назовите карту'
     )
+    group = models.ManyToManyField(
+        Group,
+        verbose_name='Категории'
+    )
+    validation = models.BooleanField(
+        verbose_name='Критерий валидации магазина',
+        blank=True,
+        default=False,
+    )
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
         help_text='Загрузите логотип магазина'
     )
-    group = models.ManyToManyField(
-        Group,
-        verbose_name='Категории'
+    color = models.CharField(
+        verbose_name='Цвет магазина',
+        max_length=MAX_LENGTH_COLOR,
+        validators=[validate_color_format],
+        blank=True,
     )
 
     class Meta:
@@ -114,7 +131,7 @@ class Card(models.Model):
 
 
 class Favourites(models.Model):
-    """Класс предназначет для хранения в бд списка избраных
+    """Класс предназначен для хранения в бд списка избранных
     карт пользователя"""
     user = models.ForeignKey(
         User,
@@ -125,7 +142,13 @@ class Favourites(models.Model):
     card = models.ForeignKey(
         Card,
         on_delete=models.CASCADE,
-        related_name='card_favourites'
+        related_name='card_favourites',
+        verbose_name='Карты'
+    )
+    belonging = models.BooleanField(
+        verbose_name='Принадлежность',
+        blank=True,
+        default=True,
     )
 
     class Meta:

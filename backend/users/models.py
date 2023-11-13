@@ -1,18 +1,17 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from phonenumber_field.modelfields import PhoneNumberField
 
-from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME,
+from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL,
                           MAX_LENGTH_PASSWORD, MAX_LENGTH_USERNAME)
-# from core.models import CardQuerySet
 
 
 class User(AbstractUser):
     """Класс переопределяет стандартную модель User"""
     email = models.EmailField(
-        unique=True,
         verbose_name=_("Адрес электронной почты"),
+        unique=True,
         blank=False,
         error_messages={
             'unique': _('Пользователь с таким email уже существует')
@@ -27,10 +26,12 @@ class User(AbstractUser):
         max_length=MAX_LENGTH_USERNAME,
         help_text=_('Укажите свое имя'),
     )
-
-    phone_number = PhoneNumberField(
-        region="RU",
+    phone_number = models.PositiveIntegerField(
         max_length=LEN_NUMBER,
+        validators=[RegexValidator(
+            regex=r'^([9]{1}[0-9]{9})?$'
+            'Номер телефона после +7 начинается с 9'
+        )],
         blank=False,
         unique=True
     )
@@ -39,6 +40,11 @@ class User(AbstractUser):
         help_text=_('Введите пароль'),
         max_length=MAX_LENGTH_PASSWORD,
     )
+    pub_date = models.DateTimeField(
+        'Дата регистрации',
+        auto_now_add=True
+    )
+
     # objects отключено пока не решено, при подключении необходимо проверить
     # objects = CardQuerySet.as_manager()
 
