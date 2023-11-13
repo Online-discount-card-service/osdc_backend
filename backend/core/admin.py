@@ -23,6 +23,8 @@ class ShopAdmin(admin.ModelAdmin):
         'id',
         'name',
         'logo',
+        'color',
+        'validation',
     )
     empty_value_display = '-пусто-'
     search_fields = (
@@ -70,6 +72,7 @@ class FavouritesAdmin(admin.ModelAdmin):
         'id',
         'user',
         'card',
+        'belonging',
     )
     empty_value_display = '-пусто-'
     search_fields = (

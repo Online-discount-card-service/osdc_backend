@@ -44,11 +44,6 @@ class Shop(models.Model):
         Group,
         verbose_name='Категории'
     )
-    validation = models.BooleanField(
-        verbose_name='Критерий валидации магазина',
-        blank=True,
-        default=False,
-    )
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
@@ -59,6 +54,11 @@ class Shop(models.Model):
         max_length=MAX_LENGTH_COLOR,
         validators=[validate_color_format],
         blank=True,
+    )
+    validation = models.BooleanField(
+        verbose_name='Критерий валидации магазина',
+        blank=True,
+        default=False,
     )
 
     class Meta:
