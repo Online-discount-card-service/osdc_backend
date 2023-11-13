@@ -57,7 +57,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           cd /home/${{ secrets.USER }}/app/infra
           sudo rm -f .env
@@ -72,12 +71,6 @@ jobs:
           echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo DB_HOST="db" >> .env
           echo DB_PORT="${{ secrets.DB_PORT }}" >> .env
-
-#          echo ADMIN_USERNAME="${{ secrets.ADMIN_USERNAME }}" >> .env
-#          echo ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}" >> .env
-#          echo ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}" >> .env
-#          echo ADMIN_FIRSTNAME="${{ secrets.ADMIN_FIRSTNAME }}" >> .env
-#          echo ADMIN_LASTNAME="${{ secrets.ADMIN_LASTNAME }}" >> .env
 
           sudo docker compose stop
           sudo docker compose rm backend -f

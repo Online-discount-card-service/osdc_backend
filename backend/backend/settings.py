@@ -14,7 +14,16 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='some_secret_key')
 
 DEBUG = os.getenv('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'skidivay.ddns.net', '80.87.107.140']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'skidivay.ddns.net',
+    '80.87.107.140',
+    'backend',
+]
+
+CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
+CSRF_TRUSTED_ORIGINS = [f'http://*.{CSRF_TRUSTED}']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
