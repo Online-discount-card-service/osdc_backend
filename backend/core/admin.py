@@ -42,6 +42,8 @@ class CardAdmin(admin.ModelAdmin):
         'owner',
         'pub_date',
         'shop',
+        'card_number',
+        'barcode_number'
     )
     empty_value_display = '-пусто-'
     search_fields = (
@@ -49,12 +51,16 @@ class CardAdmin(admin.ModelAdmin):
         'owner',
         'pub_date',
         'shop',
+        'card_number',
+        'barcode_number'
     )
     list_filter = (
         'name',
         'owner',
         'pub_date',
         'shop',
+        'card_number',
+        'barcode_number'
     )
 
 

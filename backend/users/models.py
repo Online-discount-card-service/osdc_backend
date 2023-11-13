@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME,
                           MAX_LENGTH_PASSWORD, MAX_LENGTH_USERNAME)
+# from core.models import CardQuerySet
 
 
 class User(AbstractUser):
@@ -21,26 +22,28 @@ class User(AbstractUser):
     )
     username = models.CharField(
         verbose_name=_("Ваше имя"),
-        unique=True,
-        blank=True,
+        unique=False,
+        blank=False,
         max_length=MAX_LENGTH_USERNAME,
         help_text=_('Укажите свое имя'),
     )
-    first_name = models.CharField(
-        verbose_name=_('first name'),
-        max_length=MAX_LENGTH_NAME,
-        blank=True
-    )
+
     phone_number = PhoneNumberField(
         region="RU",
         max_length=LEN_NUMBER,
-        blank=False
+        blank=False,
+        unique=True
     )
     password = models.CharField(
         verbose_name=_('Пароль'),
         help_text=_('Введите пароль'),
         max_length=MAX_LENGTH_PASSWORD,
     )
+    # objects отключено пока не решено, при подключении необходимо проверить
+    # objects = CardQuerySet.as_manager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = "Пользователь"
