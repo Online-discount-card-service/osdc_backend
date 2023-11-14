@@ -1,17 +1,19 @@
-from typing import Optional
-
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Exists, OuterRef
 
-from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
-                     MAX_LENGTH_SHOP_NAME, MAX_LENGTH_CARD_NUMBER)
+from core.consts import (
+    MAX_LENGTH_CARD_NAME,
+    MAX_LENGTH_CARD_NUMBER,
+    MAX_LENGTH_GROUP_NAME,
+    MAX_LENGTH_SHOP_NAME,
+)
 
 User = get_user_model()
 
 
 class Group(models.Model):
-    """Данный класс предназначен для создания в бд категорий"""
+    """Класс для представления Категории."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
@@ -28,7 +30,8 @@ class Group(models.Model):
 
 
 class Shop(models.Model):
-    """Клас предназначен для создания в бд перечня магазинов"""
+    """Клас для представления магазинов."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название карты',
@@ -54,7 +57,8 @@ class Shop(models.Model):
 
 
 class Card(models.Model):
-    """Класс предназначен для создания карты пользователя в бд"""
+    """Класс для представления Карт."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
         blank=False,
@@ -114,8 +118,8 @@ class Card(models.Model):
 
 
 class Favourites(models.Model):
-    """Класс предназначет для хранения в бд списка избраных
-    карт пользователя"""
+    """Модель для избраных карт пользователя."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

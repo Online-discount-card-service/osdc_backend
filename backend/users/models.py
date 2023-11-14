@@ -3,13 +3,21 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME,
-                          MAX_LENGTH_PASSWORD, MAX_LENGTH_USERNAME)
 # from core.models import CardQuerySet
+from users.consts import (
+    LEN_NUMBER,
+    MAX_LENGTH_EMAIL,
+    # MAX_LENGTH_NAME,
+    MAX_LENGTH_PASSWORD,
+    MAX_LENGTH_USERNAME,
+)
+
+
 
 
 class User(AbstractUser):
-    """Класс переопределяет стандартную модель User"""
+    """Класс переопределяет стандартную модель User."""
+
     email = models.EmailField(
         unique=True,
         verbose_name=_("Адрес электронной почты"),
