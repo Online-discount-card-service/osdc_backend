@@ -1,17 +1,15 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator
 from django.db import models
 
 from .consts import (
     EAN_13,
     ENCODING_TYPE,
-    MAX_LENGTH_ENCODING_TYPE,
     MAX_LENGTH_CARD_NAME,
+    MAX_LENGTH_CARD_NUMBER,
     MAX_LENGTH_COLOR,
+    MAX_LENGTH_ENCODING_TYPE,
     MAX_LENGTH_GROUP_NAME,
     MAX_LENGTH_SHOP_NAME,
-    MAX_LENGTH_CARD_NUMBER,
-    MAX_VALUE_NUMBER_USER,
 )
 from .validators import validate_color_format
 
@@ -19,7 +17,8 @@ User = get_user_model()
 
 
 class Group(models.Model):
-    """Данный класс предназначен для создания в бд категорий"""
+    """Данный класс предназначен для создания в бд категорий."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
@@ -36,7 +35,8 @@ class Group(models.Model):
 
 
 class Shop(models.Model):
-    """Клас предназначен для создания в бд перечня магазинов"""
+    """Клас предназначен для создания в бд перечня магазинов."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название карты',
@@ -73,7 +73,8 @@ class Shop(models.Model):
 
 
 class Card(models.Model):
-    """Класс предназначен для создания карты пользователя в бд"""
+    """Класс предназначен для создания карты пользователя в бд."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
         blank=False,
@@ -114,17 +115,12 @@ class Card(models.Model):
     encoding_type = models.CharField(
         max_length=MAX_LENGTH_ENCODING_TYPE,
         verbose_name='Тип кодировки бар-кода карты',
-        choices=ENCODING_TYPE, 
+        choices=ENCODING_TYPE,
         default=EAN_13
     )
-    number_user_card = models.PositiveBigIntegerField(
+    usage_counter = models.PositiveBigIntegerField(
         verbose_name='Количество использования карты',
-        validators=[
-            MaxValueValidator(
-                MAX_VALUE_NUMBER_USER,
-                'Максимальное количество использования карты.'
-            )
-        ],
+        default=0,
         blank=True
     )
 
@@ -138,8 +134,8 @@ class Card(models.Model):
 
 
 class UserCards(models.Model):
-    """Класс предназначен для хранения в бд списка избранных
-    карт пользователя"""
+    """Карты пользователя."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

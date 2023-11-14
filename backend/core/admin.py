@@ -1,6 +1,5 @@
-from django.contrib import admin
-
 from core.models import Card, Group, Shop, UserCards
+from django.contrib import admin
 
 
 @admin.register(Group)
@@ -46,7 +45,7 @@ class CardAdmin(admin.ModelAdmin):
         'card_number',
         'barcode_number',
         'encoding_type',
-        'number_user_card'
+        'usage_counter'
     )
     empty_value_display = '-пусто-'
     search_fields = (

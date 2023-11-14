@@ -1,9 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from users.consts import (
     LEN_NUMBER,
     MAX_LENGTH_EMAIL,
@@ -37,7 +36,7 @@ class User(AbstractUser):
             UnicodeUsernameValidator(),
         ]
     )
-    phone_number = models.PositiveIntegerField(
+    phone_number = models.CharField(
         max_length=LEN_NUMBER,
         validators=[RegexValidator(
             regex=r'^([9]{1}[0-9]{9})?$'
