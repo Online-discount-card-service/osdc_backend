@@ -9,8 +9,9 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'username',
         'phone_number',
-        'pub_date',
+        'date_joined',
+        'last_login',
     )
-    list_filter = ('pub_date',)
+    list_filter = ('date_joined',)
     search_fields = ('email', 'username',)
-    ordering = ('-pub_date',)
+    ordering = ('-date_joined',)

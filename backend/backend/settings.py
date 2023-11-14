@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'api',
     'core',
     'users.apps.UsersConfig',
-    'phonenumber_field',
     'drf_yasg',
 ]
 
