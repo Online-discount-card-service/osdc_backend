@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.models import Card, Favourites, Group, Shop
+from core.models import Card, Group, Shop, UserCards
 
 
 @admin.register(Group)
@@ -23,6 +23,8 @@ class ShopAdmin(admin.ModelAdmin):
         'id',
         'name',
         'logo',
+        'color',
+        'validation',
     )
     empty_value_display = '-пусто-'
     search_fields = (
@@ -39,37 +41,39 @@ class CardAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'owner',
-        'pub_date',
         'shop',
+        'pub_date',
         'card_number',
-        'barcode_number'
+        'barcode_number',
+        'encoding_type',
+        'number_user_card'
     )
     empty_value_display = '-пусто-'
     search_fields = (
         'name',
-        'owner',
-        'pub_date',
         'shop',
+        'pub_date',
         'card_number',
-        'barcode_number'
+        'barcode_number',
+        'encoding_type',
     )
     list_filter = (
         'name',
-        'owner',
-        'pub_date',
         'shop',
+        'pub_date',
         'card_number',
-        'barcode_number'
+        'barcode_number',
+        'encoding_type',
     )
 
 
-@admin.register(Favourites)
-class FavouritesAdmin(admin.ModelAdmin):
+@admin.register(UserCards)
+class UserCardsAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'user',
         'card',
+        'owner',
     )
     empty_value_display = '-пусто-'
     search_fields = (

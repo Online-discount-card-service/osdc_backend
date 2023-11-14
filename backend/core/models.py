@@ -1,11 +1,19 @@
-from typing import Optional
-
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models import Exists, OuterRef
 
-from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
-                     MAX_LENGTH_SHOP_NAME, MAX_LENGTH_CARD_NUMBER)
+from .consts import (
+    EAN_13,
+    ENCODING_TYPE,
+    MAX_LENGTH_ENCODING_TYPE,
+    MAX_LENGTH_CARD_NAME,
+    MAX_LENGTH_COLOR,
+    MAX_LENGTH_GROUP_NAME,
+    MAX_LENGTH_SHOP_NAME,
+    MAX_LENGTH_CARD_NUMBER,
+    MAX_VALUE_NUMBER_USER,
+)
+from .validators import validate_color_format
 
 User = get_user_model()
 
@@ -34,14 +42,25 @@ class Shop(models.Model):
         verbose_name='Название карты',
         help_text='Назовите карту'
     )
+    group = models.ManyToManyField(
+        Group,
+        verbose_name='Категории'
+    )
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
         help_text='Загрузите логотип магазина'
     )
-    group = models.ManyToManyField(
-        Group,
-        verbose_name='Категории'
+    color = models.CharField(
+        verbose_name='Цвет магазина',
+        max_length=MAX_LENGTH_COLOR,
+        validators=[validate_color_format],
+        blank=True,
+    )
+    validation = models.BooleanField(
+        verbose_name='Критерий валидации магазина',
+        blank=True,
+        default=False,
     )
 
     class Meta:
@@ -61,12 +80,6 @@ class Card(models.Model):
         verbose_name='Название карты',
         help_text='Введите название карты',
         unique=True
-    )
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='cards',
-        verbose_name='Владелец'
     )
     shop = models.ForeignKey(
         Shop,
@@ -98,9 +111,20 @@ class Card(models.Model):
         help_text='Введите номер штрих-кода',
         blank=True
     )
-    group = models.ManyToManyField(
-        Group,
-        verbose_name='Категории',
+    encoding_type = models.CharField(
+        max_length=MAX_LENGTH_ENCODING_TYPE,
+        verbose_name='Тип кодировки бар-кода карты',
+        choices=ENCODING_TYPE, 
+        default=EAN_13
+    )
+    number_user_card = models.PositiveBigIntegerField(
+        verbose_name='Количество использования карты',
+        validators=[
+            MaxValueValidator(
+                MAX_VALUE_NUMBER_USER,
+                'Максимальное количество использования карты.'
+            )
+        ],
         blank=True
     )
 
@@ -113,8 +137,8 @@ class Card(models.Model):
         return self.name
 
 
-class Favourites(models.Model):
-    """Класс предназначет для хранения в бд списка избраных
+class UserCards(models.Model):
+    """Класс предназначен для хранения в бд списка избранных
     карт пользователя"""
     user = models.ForeignKey(
         User,
@@ -125,7 +149,13 @@ class Favourites(models.Model):
     card = models.ForeignKey(
         Card,
         on_delete=models.CASCADE,
-        related_name='card_favourites'
+        related_name='card_favourites',
+        verbose_name='Карты'
+    )
+    owner = models.BooleanField(
+        verbose_name='Принадлежность',
+        blank=True,
+        default=True,
     )
 
     class Meta:
@@ -144,19 +174,3 @@ class Favourites(models.Model):
 
     def __str__(self):
         return f'{self.card} в списке избранного пользователя {self.user}'
-
-
-# class CardQuerySet(models.QuerySet):
-#     """Менеджер для выдачи запросов по картам и подпискам с пользователем.
-#     Пока не используется"""
-#     def add_user_annotations(self, user_id: Optional[int]):
-#         return self.annotate(
-#             is_favorite=Exists(
-#                 Favourites.objects.filter(
-#                     user_id=user_id, card_id=OuterRef('pk')
-#                 )
-#             ),
-#             card=Card.objects.filter(
-#                 owner_id=user_id
-#             )
-#         )
