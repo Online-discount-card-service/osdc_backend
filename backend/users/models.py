@@ -1,15 +1,20 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-
-from users.consts import (LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME,
-                          MAX_LENGTH_PASSWORD, MAX_LENGTH_USERNAME)
-# from core.models import CardQuerySet
+from users.consts import (
+    LEN_NUMBER,
+    MAX_LENGTH_EMAIL,
+    MAX_LENGTH_PASSWORD,
+    MAX_LENGTH_USERNAME,
+)
+from users.validators import validate_username_in_reserved_list
 
 
 class User(AbstractUser):
-    """Класс переопределяет стандартную модель User"""
+    """Класс переопределяет стандартную модель User."""
+
     email = models.EmailField(
         unique=True,
         verbose_name=_("Адрес электронной почты"),
@@ -21,11 +26,15 @@ class User(AbstractUser):
         max_length=MAX_LENGTH_EMAIL
     )
     username = models.CharField(
-        verbose_name=_("Ваше имя"),
+        verbose_name=_("Username"),
         unique=False,
         blank=False,
         max_length=MAX_LENGTH_USERNAME,
-        help_text=_('Укажите свое имя'),
+        help_text=_('Укажите username'),
+        validators=[
+            validate_username_in_reserved_list,
+            UnicodeUsernameValidator(),
+        ]
     )
 
     phone_number = PhoneNumberField(
@@ -39,8 +48,6 @@ class User(AbstractUser):
         help_text=_('Введите пароль'),
         max_length=MAX_LENGTH_PASSWORD,
     )
-    # objects отключено пока не решено, при подключении необходимо проверить
-    # objects = CardQuerySet.as_manager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
