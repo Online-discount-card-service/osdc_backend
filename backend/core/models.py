@@ -40,17 +40,22 @@ class Shop(models.Model):
 
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
-        verbose_name='Название карты',
-        help_text='Назовите карту'
+        verbose_name='Название магазина',
+        help_text='Назовите магазин'
     )
     group = models.ManyToManyField(
         Group,
-        verbose_name='Категории'
+        verbose_name='Категории',
+        blank=True
     )
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
-        help_text='Загрузите логотип магазина'
+        help_text='Загрузите логотип магазина',
+        # нужен путь до дефолтной картинки(лого сервиса)
+        # default= 'shop/default.jpg',
+        null=True,
+        blank=True
     )
     color = models.CharField(
         verbose_name='Цвет магазина',
