@@ -3,6 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
+from django.core.files.base import ContentFile
 
 from core.models import Card, Group, Shop
 
@@ -22,13 +23,13 @@ class Base64ImageField(serializers.ImageField):
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    """ Сериализатор для модели Категории."""
+    """Сериализатор для модели Категории."""
 
     class Meta:
         model = Group
         fields = (
             'id',
-            'name'
+            'name',
         )
 
 
@@ -45,25 +46,32 @@ class ShopSerializer(serializers.ModelSerializer):
 class CardSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Карты."""
 
-    owner = UserSerializer(read_only=True)
     shop = serializers.PrimaryKeyRelatedField(
-        queryset=Shop.objects.all(), required=False)
-    image_card = Base64ImageField(required=False)
+        queryset=Shop.objects.all(),
+        required=False,
+    )
+    image_card = Base64ImageField(
+        required=False
+    )
 
     class Meta:
         model = Card
         fields = (
             'id',
             'name',
-            'owner',
             'shop',
             'image_card',
             'card_number',
             'barcode_number',
+            'encoding_type',
+            'usage_counter',
         )
 
     def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
+        instance.name = validated_data.get(
+            'name',
+            instance.name
+        )
         instance.image_card = validated_data.get(
             'image_card',
             instance.image_card
@@ -76,7 +84,14 @@ class CardSerializer(serializers.ModelSerializer):
             'barcode_number',
             instance.barcode_number
         )
-        instance.shop = validated_data.get('shop', instance.shop)
+        instance.shop = validated_data.get(
+            'shop',
+            instance.shop
+        )
+        instance.name = validated_data.get(
+            'encoding_type',
+            instance.encoding_type
+        )
         instance.save()
         return instance
 
@@ -101,15 +116,15 @@ class CardReadSerializer(serializers.ModelSerializer):
             'image_card',
             'card_number',
             'barcode_number',
-            'group'
+            'encoding_type',
+            'usage_counter',
         )
 
 
 class CardForUserSerializer(serializers.ModelSerializer):
     """Сериализатор для Карт при запросе на эндпоинт api/users."""
 
-    shop = serializers.PrimaryKeyRelatedField(
-        queryset=Shop.objects.all())
+    shop = serializers.PrimaryKeyRelatedField(queryset=Shop.objects.all())
 
     class Meta:
         model = Card
@@ -120,7 +135,8 @@ class CardForUserSerializer(serializers.ModelSerializer):
             'image_card',
             'card_number',
             'barcode_number',
-            'group'
+            'encoding_type',
+            'usage_counter',
         )
 
 

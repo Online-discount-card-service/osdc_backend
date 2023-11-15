@@ -12,10 +12,7 @@ User = get_user_model()
 
 
 class UserViewSet(UserViewSet):
-    """Вьюсет для данных пользователя.
-
-    Возможны просмотр и редактирование.
-    """
+    """Вьюсет для данных пользователя. Возможны просмотр и редактирование."""
 
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
