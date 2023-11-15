@@ -19,7 +19,6 @@ User = get_user_model()
 class Group(models.Model):
     """Класс для представления Категории."""
 
-
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
@@ -154,6 +153,11 @@ class UserCards(models.Model):
         blank=True,
         default=True,
     )
+    favourite = models.BooleanField(
+        verbose_name='Избранное',
+        blank=True,
+        default=False,
+    )
 
     class Meta:
         constraints = (
@@ -165,9 +169,9 @@ class UserCards(models.Model):
                 name='uniq_favorites'
             ),
         )
-        verbose_name = 'Список избранного'
-        verbose_name_plural = 'Список избранного'
+        verbose_name = 'Карта пользователя'
+        verbose_name_plural = 'Список карт пользователя'
         ordering = ('user',)
 
     def __str__(self):
-        return f'{self.card} в списке избранного пользователя {self.user}'
+        return f'{self.card} в списке карт пользователя {self.user}'
