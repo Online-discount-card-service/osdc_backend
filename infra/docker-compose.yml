@@ -8,10 +8,11 @@ services:
       - pg_data:/var/lib/postgresql/data/
 
   frontend:
-    image: ${FRONTEND_IMAGE}
-    command: ["sh", "-c", "npm run build && cp -r /app/dist/. /app-shared/"]
+    build:
+      context: .
+      dockerfile: ./Dockerfile_front
     volumes:
-      - ./frontend-shared:/app-shared
+      - ./frontend-shared:/app/result_build
 
   backend:
     build: ../backend/
