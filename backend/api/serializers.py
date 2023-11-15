@@ -37,10 +37,19 @@ class ShopSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Магазины."""
 
     group = GroupSerializer(many=True)
+    image = Base64ImageField(read_only=True) 
 
     class Meta:
         model = Shop
         fields = '__all__'
+
+
+class ShopCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания Магазина."""
+
+    class Meta:
+        model = Shop
+        fields = 'name'
 
 
 class CardSerializer(serializers.ModelSerializer):
