@@ -65,6 +65,9 @@ jobs:
           echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo CSRF_TRUSTED="${{ secrets.HOST }}" >> .env
 
+          # TODO: remove this line
+          echo DEBUG=True >> .env
+
           echo DB_ENGINE="django.db.backends.postgresql" >> .env
           echo DB_NAME="${{ secrets.POSTGRES_USER }}" >> .env
           echo POSTGRES_USER="${{ secrets.POSTGRES_USER }}" >> .env
