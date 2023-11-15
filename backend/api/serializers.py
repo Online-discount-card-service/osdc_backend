@@ -5,6 +5,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from core.models import Card, Group, Shop
+
 from users.models import User
 
 
@@ -59,7 +60,6 @@ class CardSerializer(serializers.ModelSerializer):
             'image_card',
             'card_number',
             'barcode_number',
-            'group'
         )
 
     def update(self, instance, validated_data):
@@ -154,5 +154,4 @@ class UserReadSerializer(UserSerializer):
             'email',
             'username',
             'phone_number',
-            'cards'
         )
