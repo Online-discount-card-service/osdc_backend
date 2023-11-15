@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from users.consts import (
     LEN_NUMBER,
     MAX_LENGTH_EMAIL,
+    MAX_LENGTH_NAME,
     MAX_LENGTH_PASSWORD,
     MAX_LENGTH_USERNAME,
 )
@@ -24,6 +25,17 @@ class User(AbstractUser):
         },
         help_text=_('Укажите свой email'),
         max_length=MAX_LENGTH_EMAIL
+    )
+    name = models.CharField(
+        verbose_name=_("Имя"),
+        unique=False,
+        blank=False,
+        max_length=MAX_LENGTH_NAME,
+        help_text=_('Укажите свое имя'),
+        validators=[RegexValidator(
+            regex=r'^[a-zA-Zа-яА-Я\s-]{1,60}$',
+            message='Имя может содержать только буквы, пробелы и тире',
+        )]
     )
     username = models.CharField(
         verbose_name=_("Username"),
