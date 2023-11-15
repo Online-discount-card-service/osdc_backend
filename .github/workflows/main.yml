@@ -48,7 +48,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "backend/, frontend/, infra/"
+        source: "backend/, infra/"
         target: /home/${{ secrets.USER }}/app
 
     - name: Building Docker image on remote server and deploy
