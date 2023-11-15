@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from core.models import Card, Group, Shop
 
@@ -11,10 +11,12 @@ from .serializers import CardSerializer, GroupSerializer, ShopSerializer
 User = get_user_model()
 
 
-# Переопределила страницу users/me, чтобы убрать лишние методы PUT и DELETE
 class UserViewSet(UserViewSet):
-    """Набор представлений для просмотра и редактирования
-    пользовательских экземпляров."""
+    """Вьюсет для данных пользователя.
+
+    Возможны просмотр и редактирование.
+    """
+
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     @action(["get", "patch"], detail=False)
@@ -27,7 +29,8 @@ class UserViewSet(UserViewSet):
 
 
 class CardViewSet(viewsets.ModelViewSet):
-    """"""
+    """Вьюсет для класса Карт."""
+
     queryset = Card.objects.all()
     serializer_class = CardSerializer
 
@@ -36,12 +39,14 @@ class CardViewSet(viewsets.ModelViewSet):
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
-    """"""
+    """Вьюсет для отображения единично и списком Магазинов."""
+
     queryset = Shop.objects.all()
     serializer_class = ShopSerializer
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    """"""
+    """Вьюсет для отображения единично и списком Категорий."""
+
     queryset = Group.objects.all()
     serializer_class = GroupSerializer

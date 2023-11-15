@@ -17,7 +17,8 @@ User = get_user_model()
 
 
 class Group(models.Model):
-    """Данный класс предназначен для создания в бд категорий."""
+    """Класс для представления Категории."""
+
 
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
@@ -35,7 +36,7 @@ class Group(models.Model):
 
 
 class Shop(models.Model):
-    """Клас предназначен для создания в бд перечня магазинов."""
+    """Клас для представления магазинов."""
 
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
@@ -73,7 +74,7 @@ class Shop(models.Model):
 
 
 class Card(models.Model):
-    """Класс предназначен для создания карты пользователя в бд."""
+    """Класс для представления Карт."""
 
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
