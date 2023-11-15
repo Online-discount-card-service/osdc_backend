@@ -79,4 +79,5 @@ jobs:
 
           sudo docker compose stop
           sudo docker compose rm backend -f
+          sudo docker compose pull
           sudo docker compose up --build -d --force-recreate
