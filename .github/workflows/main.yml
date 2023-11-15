@@ -48,7 +48,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "backend/, frontend/, infra/"
+        source: "backend/, infra/"
         target: /home/${{ secrets.USER }}/app
 
     - name: Building Docker image on remote server and deploy
@@ -64,6 +64,8 @@ jobs:
 
           echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo CSRF_TRUSTED="${{ secrets.HOST }}" >> .env
+
+          echo FRONTEND_IMAGE="${{ secrets.FRONTEND_IMAGE }}" >> .env
 
           # TODO: remove this line
           echo DEBUG=True >> .env

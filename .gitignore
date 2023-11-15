@@ -138,3 +138,4 @@ media/
 
 .DS_Store
 
+/infra/frontend-shared/
