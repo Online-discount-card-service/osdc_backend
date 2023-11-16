@@ -12,7 +12,7 @@ services:
       context: .
       dockerfile: ./Dockerfile_front
     volumes:
-      - ./frontend-shared:/app/result_build
+      - ./frontend-shared:/app/result_build/
 
   backend:
     build: ../backend/
