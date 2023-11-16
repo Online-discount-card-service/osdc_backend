@@ -41,7 +41,7 @@ class CardViewSet(viewsets.ModelViewSet):
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для отображения единично и списком Магазинов."""
 
-    queryset = Shop.objects.all()
+    queryset = Shop.objects.filter(validation=True)
     serializer_class = ShopSerializer
     permission_classes = (AllowAny,)
 
