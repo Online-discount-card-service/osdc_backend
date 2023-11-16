@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from core.models import Card, Group, Shop
 
@@ -41,8 +41,9 @@ class CardViewSet(viewsets.ModelViewSet):
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для отображения единично и списком Магазинов."""
 
-    queryset = Shop.objects.all()
+    queryset = Shop.objects.filter(validation=True)
     serializer_class = ShopSerializer
+    permission_classes = (AllowAny,)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
