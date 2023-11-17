@@ -4,6 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,8 +18,8 @@ DEBUG = os.getenv('DEBUG', default=False)
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'skidivay.ddns.net',
-    '80.87.107.140',
+    'skidivay.acceleratorpracticum.ru',
+    '213.189.221.97',
     'backend',
 ]
 
