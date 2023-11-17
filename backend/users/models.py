@@ -3,6 +3,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 from users.consts import (
     LEN_NUMBER,
     MAX_LENGTH_EMAIL,
@@ -23,7 +24,6 @@ class User(AbstractUser):
         error_messages={
             'unique': _('Пользователь с таким email уже существует')
         },
-        help_text=_('Укажите свой email'),
         max_length=MAX_LENGTH_EMAIL
     )
     name = models.CharField(
@@ -31,7 +31,6 @@ class User(AbstractUser):
         unique=False,
         blank=False,
         max_length=MAX_LENGTH_NAME,
-        help_text=_('Укажите свое имя'),
         validators=[RegexValidator(
             regex=r'^[a-zA-Zа-яА-Я\s-]{1,60}$',
             message='Имя может содержать только буквы, пробелы и тире',
@@ -42,7 +41,6 @@ class User(AbstractUser):
         unique=False,
         blank=False,
         max_length=MAX_LENGTH_USERNAME,
-        help_text=_('Укажите username'),
         validators=[
             validate_username_in_reserved_list,
             UnicodeUsernameValidator(),
@@ -59,7 +57,6 @@ class User(AbstractUser):
     )
     password = models.CharField(
         verbose_name=_('Пароль'),
-        help_text=_('Введите пароль'),
         max_length=MAX_LENGTH_PASSWORD,
     )
 
