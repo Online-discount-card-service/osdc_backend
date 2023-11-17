@@ -146,8 +146,4 @@ DJOSER = {
         'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
     },
     'HIDE_USERS': False,
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': False,
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_CONFRIMATION_EMAIL': False,
 }
