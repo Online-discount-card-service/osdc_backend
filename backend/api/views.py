@@ -34,6 +34,9 @@ class CardViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    def get_queryset(self):
+        return self.request.user.cards
+
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для отображения единично и списком Магазинов."""

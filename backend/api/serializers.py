@@ -1,25 +1,9 @@
-import base64
-
-from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from django.core.files.base import ContentFile
 
 from core.models import Card, Group, Shop
 
 from users.models import User
-
-
-class Base64ImageField(serializers.ImageField):
-    """Кастомное поле для изображений."""
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -46,12 +30,16 @@ class ShopSerializer(serializers.ModelSerializer):
 class CardSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Карты."""
 
-    shop = serializers.PrimaryKeyRelatedField(
-        queryset=Shop.objects.all(),
-        required=False,
-    )
-    image_card = Base64ImageField(
-        required=False
+    # shop = serializers.PrimaryKeyRelatedField(
+    #     queryset=Shop.objects.all(),
+    #     required=False,
+    # )
+
+    shop = ShopSerializer()
+
+    image = serializers.SerializerMethodField(
+        'get_image_url',
+        read_only=True,
     )
 
     class Meta:
@@ -66,6 +54,12 @@ class CardSerializer(serializers.ModelSerializer):
             'encoding_type',
             'usage_counter',
         )
+
+    def get_image_url(self, obj):
+        """Возвращает относительный путь изображения."""
+        if obj.image:
+            return obj.image.url
+        return None
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get(
