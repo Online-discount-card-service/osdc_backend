@@ -2,7 +2,6 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from core.models import Card, Group, Shop
-
 from users.models import User
 
 
@@ -25,6 +24,14 @@ class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
         fields = '__all__'
+
+
+# class ShopCreateSerializer(serializers.ModelSerializer):
+    # """Сериализатор для создания Магазина."""
+
+    # class Meta:
+        # model = Shop
+        # fields = 'name'
 
 
 class CardSerializer(serializers.ModelSerializer):

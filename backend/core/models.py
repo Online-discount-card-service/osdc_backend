@@ -19,7 +19,6 @@ User = get_user_model()
 class Group(models.Model):
     """Класс для представления Категории."""
 
-
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
@@ -40,17 +39,22 @@ class Shop(models.Model):
 
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
-        verbose_name='Название карты',
-        help_text='Назовите карту'
+        verbose_name='Название магазина',
+        help_text='Назовите магазин'
     )
     group = models.ManyToManyField(
         Group,
-        verbose_name='Категории'
+        verbose_name='Категории',
+        blank=True
     )
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
-        help_text='Загрузите логотип магазина'
+        help_text='Загрузите логотип магазина',
+        # нужен путь до дефолтной картинки(лого сервиса)
+        # default= 'shop/default.jpg',
+        null=True,
+        blank=True
     )
     color = models.CharField(
         verbose_name='Цвет магазина',
@@ -154,6 +158,11 @@ class UserCards(models.Model):
         blank=True,
         default=True,
     )
+    favourite = models.BooleanField(
+        verbose_name='Избранное',
+        blank=True,
+        default=False,
+    )
 
     class Meta:
         constraints = (
@@ -165,9 +174,9 @@ class UserCards(models.Model):
                 name='uniq_favorites'
             ),
         )
-        verbose_name = 'Список избранного'
-        verbose_name_plural = 'Список избранного'
+        verbose_name = 'Карта пользователя'
+        verbose_name_plural = 'Список карт пользователя'
         ordering = ('user',)
 
     def __str__(self):
-        return f'{self.card} в списке избранного пользователя {self.user}'
+        return f'{self.card} в списке карт пользователя {self.user}'
