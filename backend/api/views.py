@@ -1,21 +1,30 @@
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 
-from core.models import Card, Group, Shop
+from core.models import Card, Group, Shop, UserCards
 
-from .serializers import CardSerializer, GroupSerializer, ShopSerializer
+from .serializers import (
+    CardEditSerializer,
+    CardSerializer,
+    CardsListSerializer,
+    GroupSerializer,
+    ShopSerializer,
+)
+
 
 User = get_user_model()
 
 
 class UserViewSet(UserViewSet):
-    """Вьюсет для данных пользователя.
-
-    Возможны просмотр и редактирование.
-    """
+    """Вьюсет для данных пользователя. Возможны просмотр и редактирование."""
 
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
@@ -33,9 +42,115 @@ class CardViewSet(viewsets.ModelViewSet):
 
     queryset = Card.objects.all()
     serializer_class = CardSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CardsListSerializer
+        elif self.action == 'create':
+            return CardEditSerializer
+        return CardSerializer
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return
+        if self.action == 'list':
+            return (
+                self.request.user.cards.
+                select_related('card', 'card__shop').
+                prefetch_related('card__shop__group')
+            )
+        else:
+            return (
+                Card.objects.filter(users=self.request.user).
+                select_related('shop').
+                prefetch_related('shop__group')
+            )
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        card = serializer.save()
+
+        user = self.request.user
+        UserCards.objects.create(
+            user=user,
+            card=card,
+            owner=True,
+            favourite=False,
+        )
+
+    @swagger_auto_schema(
+        responses={200: CardsListSerializer(many=True)},
+        operation_summary='Список карт текущего пользователя',
+        operation_description=(
+            'Проверяет авторизацию пользователя'
+            'и выдает список его карт.'
+        )
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        responses={200: CardSerializer()},
+        operation_summary='Данные конкретной карты',
+        peration_description=(
+            'Проверяет авторизацию пользователя,'
+            'выдает данные карты, если она принадлежит '
+            'пользователю.Иначе 404.'
+        )
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=CardEditSerializer(),
+        responses={201: CardEditSerializer()},
+        operation_summary='Добавление новой карты',
+        operation_description='''
+            Создает новую карту и добавляет в список пользователя. \n
+            Необходимо указать номер карты и/или штрих-кода. \n
+            Поле image - string(binary) не показано в документации,
+            но ожидается.
+            '''
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=CardEditSerializer(),
+        responses={200: CardEditSerializer()},
+        operation_summary='Редактирование карты',
+        operation_description='''
+            Редактирует карту. \n
+            Необходимо указать номер карты и/или штрих-кода. \n
+            Поле image - string(binary) не показано в документации,
+            но ожидается.
+            '''
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=CardEditSerializer(),
+        responses={200: CardEditSerializer()},
+        operation_summary='Частичное редактирование карты',
+        operation_description='''
+            Частично редактирует карту. \n
+            Необходимо указать номер карты и/или штрих-кода. \n
+            Поле image - string(binary) не показано в документации,
+            но ожидается.
+        '''
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        responses={204: None},
+        operation_summary='Удаление карты',
+        operation_description=(
+            'Удаляет все данные о карте.')
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
