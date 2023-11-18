@@ -157,7 +157,7 @@ class CardViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, url_path='favorite')
     def favorite(self, request, *args, **kwargs):
-        """Возвращает список избранных карт"""
+        """Возвращает список избранных карт."""
 
         favorite_cards = (
             self.request.user.cards.
@@ -189,7 +189,7 @@ class CreateDestroyFavViewSet(APIView):
     def post(self, request, id):
         user = request.user
         usercard = get_object_or_404(UserCards, user=user, card__id=id)
-        if usercard.favourite == True:
+        if usercard.favourite:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             usercard.favourite = True
@@ -199,7 +199,7 @@ class CreateDestroyFavViewSet(APIView):
     def delete(self, request, id):
         user = request.user
         usercard = get_object_or_404(UserCards, user=user, card__id=id)
-        if usercard.favourite == False:
+        if not usercard.favourite:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             usercard.favourite = False
