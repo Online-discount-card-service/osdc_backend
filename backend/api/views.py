@@ -92,7 +92,7 @@ class CardViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         responses={200: CardSerializer()},
         operation_summary='Данные конкретной карты',
-        peration_description=(
+        operation_description=(
             'Проверяет авторизацию пользователя,'
             'выдает данные карты, если она принадлежит '
             'пользователю.Иначе 404.'
