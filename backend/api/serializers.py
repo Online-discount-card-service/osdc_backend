@@ -79,7 +79,7 @@ class UserCustomCreateSerializer(UserCreateSerializer):
         fields = (
             'id',
             'email',
-            'username',
+            'name',
             'phone_number',
             'password'
         )
@@ -93,6 +93,6 @@ class UserReadSerializer(UserSerializer):
         fields = (
             'id',
             'email',
-            'username',
+            'name',
             'phone_number',
         )

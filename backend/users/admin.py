@@ -7,11 +7,11 @@ from users.models import User
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'email',
-        'username',
+        'name',
         'phone_number',
         'date_joined',
         'last_login',
     )
     list_filter = ('date_joined',)
-    search_fields = ('email', 'username',)
+    search_fields = ('email', 'phone_number',)
     ordering = ('-date_joined',)
