@@ -1,19 +1,21 @@
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
 )
+from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
 
 from .serializers import (
     CardEditSerializer,
     CardSerializer,
+    CardShopCreateSerializer,
     CardsListSerializer,
     GroupSerializer,
     ShopSerializer,
@@ -151,6 +153,22 @@ class CardViewSet(viewsets.ModelViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+    @action(detail=False, methods=['POST'], url_path='new-shop',)
+    def create_with_new_shop(self, request):
+        self.serializer_class = CardShopCreateSerializer
+        user = self.request.user
+        serializer = CardShopCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            card = serializer.save()
+            UserCards.objects.create(
+                user=user,
+                card=card,
+                owner=True,
+                favourite=False,
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
