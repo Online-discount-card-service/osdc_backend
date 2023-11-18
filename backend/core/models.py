@@ -13,6 +13,7 @@ from .consts import (
 )
 from .validators import validate_color_format
 
+
 User = get_user_model()
 
 
@@ -22,7 +23,6 @@ class Group(models.Model):
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
-        help_text='Введите название категории'
     )
 
     class Meta:
@@ -40,7 +40,6 @@ class Shop(models.Model):
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название магазина',
-        help_text='Назовите магазин'
     )
     group = models.ManyToManyField(
         Group,
@@ -50,9 +49,6 @@ class Shop(models.Model):
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
-        help_text='Загрузите логотип магазина',
-        # нужен путь до дефолтной картинки(лого сервиса)
-        # default= 'shop/default.jpg',
         null=True,
         blank=True
     )
@@ -84,14 +80,11 @@ class Card(models.Model):
         max_length=MAX_LENGTH_CARD_NAME,
         blank=False,
         verbose_name='Название карты',
-        help_text='Введите название карты',
-        unique=True
     )
     shop = models.ForeignKey(
         Shop,
         on_delete=models.SET_NULL,
         verbose_name='Магазин',
-        help_text='Выберите магазин',
         blank=True,
         null=True
     )
@@ -99,34 +92,39 @@ class Card(models.Model):
         verbose_name='Дата добавления карты',
         auto_now_add=True,
     )
-    image_card = models.ImageField(
+    image = models.ImageField(
         upload_to='card/',
         verbose_name='Изображение карты',
-        help_text='Загрузите изображение',
         blank=True,
     )
     card_number = models.CharField(
         max_length=MAX_LENGTH_CARD_NUMBER,
         verbose_name='Номер карты',
-        help_text='Введите номер карты',
         blank=True
     )
     barcode_number = models.CharField(
         max_length=MAX_LENGTH_CARD_NUMBER,
         verbose_name='Номер штрих-кода',
-        help_text='Введите номер штрих-кода',
         blank=True
     )
     encoding_type = models.CharField(
         max_length=MAX_LENGTH_ENCODING_TYPE,
         verbose_name='Тип кодировки бар-кода карты',
         choices=ENCODING_TYPE,
-        default=EAN_13
+        default=EAN_13,
+        blank=True
     )
     usage_counter = models.PositiveBigIntegerField(
-        verbose_name='Количество использования карты',
+        verbose_name='Количество использований карты',
         default=0,
         blank=True
+    )
+    users = models.ManyToManyField(
+        User,
+        through='UserCards',
+        through_fields=('card', 'user'),
+        verbose_name='Пользователи',
+        blank=False
     )
 
     class Meta:
@@ -144,13 +142,13 @@ class UserCards(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_favourites',
+        related_name='cards',
         verbose_name='Пользователь'
     )
     card = models.ForeignKey(
         Card,
         on_delete=models.CASCADE,
-        related_name='card_favourites',
+        related_name='+',
         verbose_name='Карты'
     )
     owner = models.BooleanField(
