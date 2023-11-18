@@ -1,4 +1,4 @@
-from api.views import CardViewSet, GroupViewSet, ShopViewSet, UserViewSet
+from api.views import CreateDestroyFavViewSet, CardViewSet, GroupViewSet, ShopViewSet, UserViewSet
 from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -31,6 +31,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('v1/', include(router.urls)),
     path('v1/auth/', include('djoser.urls.authtoken')),
+    path('v1/cards/<int:id>/favorite/', CreateDestroyFavViewSet.as_view()),
     path(
         'docs/swagger/',
         schema_view.with_ui('swagger', cache_timeout=0),
