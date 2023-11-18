@@ -47,6 +47,7 @@ class User(AbstractUser):
         ]
     )
     phone_number = models.CharField(
+        verbose_name=_("Телефон"),
         max_length=LEN_NUMBER,
         validators=[RegexValidator(
             regex=r'^([9]{1}[0-9]{9})?$',
