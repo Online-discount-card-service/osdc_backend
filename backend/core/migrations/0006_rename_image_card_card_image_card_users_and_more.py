@@ -9,7 +9,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('users', '0004_user_name'),
         ('core', '0005_alter_shop_group_alter_shop_logo'),
     ]
 
