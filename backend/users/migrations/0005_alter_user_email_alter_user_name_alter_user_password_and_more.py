@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='password',
-            field=models.CharField(max_length=255, verbose_name='Пароль'),
+            field=models.CharField(verbose_name='Пароль'),
         ),
         migrations.AlterField(
             model_name='user',

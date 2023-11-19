@@ -71,6 +71,28 @@ class CardsListSerializer(serializers.ModelSerializer):
         exclude = ('id', 'user', )
 
 
+class ShopCreateSerializer(serializers.Serializer):
+    """Сериализатор создания магазина."""
+
+    name = serializers.CharField()
+
+    class Meta:
+        model = Shop
+        fields = ('name',)
+
+
+class CardShopCreateSerializer(CardEditSerializer):
+    """Сериализатор для создания карты с новым магазином."""
+
+    shop = ShopCreateSerializer()
+
+    def create(self, validated_data):
+        shopname = validated_data.pop('shop')
+        shop = Shop.objects.create(name=shopname['name'])
+        card = Card.objects.create(shop=shop, **validated_data)
+        return card
+
+
 class UserCustomCreateSerializer(UserCreateSerializer):
     """Сериализатор регистрации пользователей."""
 
@@ -79,7 +101,7 @@ class UserCustomCreateSerializer(UserCreateSerializer):
         fields = (
             'id',
             'email',
-            'username',
+            'name',
             'phone_number',
             'password'
         )
@@ -93,6 +115,6 @@ class UserReadSerializer(UserSerializer):
         fields = (
             'id',
             'email',
-            'username',
+            'name',
             'phone_number',
         )

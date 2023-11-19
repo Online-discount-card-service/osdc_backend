@@ -1,19 +1,23 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
 )
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from core.models import Card, Group, Shop, UserCards
 
 from .serializers import (
     CardEditSerializer,
     CardSerializer,
+    CardShopCreateSerializer,
     CardsListSerializer,
     GroupSerializer,
     ShopSerializer,
@@ -152,6 +156,33 @@ class CardViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
+    @action(detail=False, url_path='favorite')
+    def favorite(self, request, *args, **kwargs):
+        """Возвращает список избранных карт."""
+
+        favorite_cards = (
+            self.request.user.cards.
+            select_related('card', 'card__shop').
+            prefetch_related('card__shop__group')
+        ).filter(favourite=True)
+        serializer = CardsListSerializer(favorite_cards, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['POST'], url_path='new-shop',)
+    def create_with_new_shop(self, request):
+        user = self.request.user
+        serializer = CardShopCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            card = serializer.save()
+            UserCards.objects.create(
+                user=user,
+                card=card,
+                owner=True,
+                favourite=False,
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для отображения единично и списком Магазинов."""
@@ -166,3 +197,31 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+class CreateDestroyFavViewSet(APIView):
+    """Вью для удаления и добавления карты в избранное."""
+
+    def post(self, request, id):
+        user = request.user
+        user_card = get_object_or_404(UserCards, user=user, card__id=id)
+        if user_card.favourite:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user_card.favourite = True
+            user_card.save()
+            card = UserCards.objects.get(user=user, card__id=id)
+            serializer = CardsListSerializer(card)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, id):
+        user = request.user
+        user_card = get_object_or_404(UserCards, user=user, card__id=id)
+        if not user_card.favourite:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user_card.favourite = False
+            user_card.save()
+            card = UserCards.objects.get(user=user, card__id=id)
+            serializer = CardsListSerializer(card)
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
