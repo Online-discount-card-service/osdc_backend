@@ -204,20 +204,24 @@ class CreateDestroyFavViewSet(APIView):
 
     def post(self, request, id):
         user = request.user
-        usercard = get_object_or_404(UserCards, user=user, card__id=id)
-        if usercard.favourite:
+        user_card = get_object_or_404(UserCards, user=user, card__id=id)
+        if user_card.favourite:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            usercard.favourite = True
-            usercard.save()
-            return Response(status=status.HTTP_201_CREATED)
+            user_card.favourite = True
+            user_card.save()
+            card = UserCards.objects.get(user=user, card__id=id)
+            serializer = CardsListSerializer(card)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, id):
         user = request.user
-        usercard = get_object_or_404(UserCards, user=user, card__id=id)
-        if not usercard.favourite:
+        user_card = get_object_or_404(UserCards, user=user, card__id=id)
+        if not user_card.favourite:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            usercard.favourite = False
-            usercard.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            user_card.favourite = False
+            user_card.save()
+            card = UserCards.objects.get(user=user, card__id=id)
+            serializer = CardsListSerializer(card)
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
