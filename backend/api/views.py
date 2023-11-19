@@ -156,7 +156,6 @@ class CardViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'], url_path='new-shop',)
     def create_with_new_shop(self, request):
-        self.serializer_class = CardShopCreateSerializer
         user = self.request.user
         serializer = CardShopCreateSerializer(data=request.data)
         if serializer.is_valid():
