@@ -61,7 +61,9 @@ class User(AbstractUser):
             message='Имя может содержать только буквы, пробелы и тире',
         )]
     )
+
     username = None
+
     phone_number = models.CharField(
         verbose_name=_("Телефон"),
         max_length=LEN_NUMBER,

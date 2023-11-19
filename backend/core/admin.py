@@ -1,5 +1,6 @@
-from core.models import Card, Group, Shop, UserCards
 from django.contrib import admin
+
+from core.models import Card, Group, Shop, UserCards
 
 
 @admin.register(Group)
