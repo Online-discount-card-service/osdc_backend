@@ -26,16 +26,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='password',
-            field=models.CharField(max_length=255, verbose_name='Пароль'),
+            field=models.CharField(verbose_name='Пароль'),
         ),
         migrations.AlterField(
             model_name='user',
             name='username',
             field=models.CharField(max_length=60, validators=[users.validators.validate_username_in_reserved_list, django.contrib.auth.validators.UnicodeUsernameValidator()], verbose_name='Username'),
-        ),
-        migrations.AlterField(
-            model_name='user',
-            name='phone_number',
-            field=models.CharField(max_length=10, unique=True, validators=[django.core.validators.RegexValidator(message='Номер телефона после +7 начинается с 9', regex='^([9]{1}[0-9]{9})?$')], verbose_name='Телефон'),
         ),
     ]

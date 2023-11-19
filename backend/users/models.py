@@ -8,7 +8,6 @@ from users.consts import (
     LEN_NUMBER,
     MAX_LENGTH_EMAIL,
     MAX_LENGTH_NAME,
-    MAX_LENGTH_PASSWORD,
     MAX_LENGTH_USERNAME,
 )
 from users.validators import validate_username_in_reserved_list
@@ -56,9 +55,8 @@ class User(AbstractUser):
         blank=False,
         unique=True
     )
-    password = models.CharField(
+    password = models.TextField(
         verbose_name=_('Пароль'),
-        max_length=MAX_LENGTH_PASSWORD,
     )
 
     USERNAME_FIELD = 'email'
