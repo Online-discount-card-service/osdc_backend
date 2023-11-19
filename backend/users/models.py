@@ -55,9 +55,6 @@ class User(AbstractUser):
         blank=False,
         unique=True
     )
-    password = models.TextField(
-        verbose_name=_('Пароль'),
-    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
