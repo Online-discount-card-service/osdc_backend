@@ -4,20 +4,14 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from users.consts import (
-    LEN_NUMBER,
-    MAX_LENGTH_EMAIL,
-    MAX_LENGTH_NAME,
-)
+from users.consts import LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 
 class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
-        """
-        Создайте и сохраните пользователя с указанным
-        адресом электронной почты и паролем.
-        """
+        """Создает и сохраняет пользователя с указанным email и паролем."""
+
         if not email:
             raise ValueError(_('Электронная почта должна быть установлена'))
         email = self.normalize_email(email)
@@ -68,7 +62,7 @@ class User(AbstractUser):
         verbose_name=_("Телефон"),
         max_length=LEN_NUMBER,
         validators=[RegexValidator(
-            regex=r'^([9]{1}[0-9]{9})?$',
+            regex=r'^\d{10}$',
             message='Номер телефона после +7 начинается с 9'
         )],
         blank=False,
