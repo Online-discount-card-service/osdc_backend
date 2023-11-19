@@ -17,6 +17,7 @@ from core.models import Card, Group, Shop, UserCards
 from .serializers import (
     CardEditSerializer,
     CardSerializer,
+    CardShopCreateSerializer,
     CardsListSerializer,
     GroupSerializer,
     ShopSerializer,
@@ -166,6 +167,21 @@ class CardViewSet(viewsets.ModelViewSet):
         ).filter(favourite=True)
         serializer = CardsListSerializer(favorite_cards, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['POST'], url_path='new-shop',)
+    def create_with_new_shop(self, request):
+        user = self.request.user
+        serializer = CardShopCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            card = serializer.save()
+            UserCards.objects.create(
+                user=user,
+                card=card,
+                owner=True,
+                favourite=False,
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
