@@ -38,7 +38,7 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name=_("Username"),
         unique=False,
-        blank=False,
+        blank=True,
         max_length=MAX_LENGTH_USERNAME,
         validators=[
             validate_username_in_reserved_list,
