@@ -83,10 +83,10 @@ class Card(models.Model):
     )
     shop = models.ForeignKey(
         Shop,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         verbose_name='Магазин',
-        blank=True,
-        null=True
+        blank=False,
+        null=False,
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата добавления карты',
