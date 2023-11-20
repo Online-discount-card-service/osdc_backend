@@ -224,4 +224,4 @@ class CreateDestroyFavViewSet(APIView):
             user_card.save()
             card = UserCards.objects.get(user=user, card__id=id)
             serializer = CardsListSerializer(card)
-            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.data, status=status.HTTP_200_OK)
