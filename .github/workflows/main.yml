@@ -67,7 +67,9 @@ jobs:
 
           echo FRONTEND_IMAGE="${{ secrets.FRONTEND_IMAGE }}" >> .env
 
-          # TODO: remove this line
+          NGINX_HOST="${{ secrets.NGINX_HOST }}" >> .env
+
+          # TODO: remove this lineß
           echo DEBUG=True >> .env
 
           echo DB_ENGINE="django.db.backends.postgresql" >> .env
