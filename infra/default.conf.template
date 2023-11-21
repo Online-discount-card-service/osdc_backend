@@ -31,7 +31,7 @@ server {
 
     listen 80;
 
-    server_name 80.87.107.140;
+    server_name $NGINX_HOST;
 
     location /admin/ {
         proxy_pass http://backend:8000;
@@ -56,5 +56,4 @@ server {
         index  index.html index.htm;
         try_files $uri $uri/ /index.html =404;
     }
-
 }
