@@ -87,8 +87,8 @@ class CardShopCreateSerializer(CardEditSerializer):
     shop = ShopCreateSerializer()
 
     def create(self, validated_data):
-        shopname = validated_data.pop('shop')
-        shop = Shop.objects.create(name=shopname['name'])
+        shop_name = validated_data.pop('shop')
+        shop = Shop.objects.create(name=shop_name['name'])
         card = Card.objects.create(shop=shop, **validated_data)
         return card
 

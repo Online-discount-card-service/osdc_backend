@@ -28,7 +28,7 @@ User = get_user_model()
 
 
 class UserViewSet(UserViewSet):
-    """Вьюсет для данных пользователя. Возможны просмотр и редактирование."""
+    """Эндпоинт для просмотра и управления пользователями."""
 
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
@@ -110,7 +110,8 @@ class CardViewSet(viewsets.ModelViewSet):
         responses={201: CardEditSerializer()},
         operation_summary='Добавление новой карты',
         operation_description='''
-            Создает новую карту и добавляет в список пользователя. \n
+            Создает новую карту и добавляет в список пользователя,
+            назначает его владельцем по умолчанию.. \n
             Необходимо указать номер карты и/или штрих-кода. \n
             Поле image - string(binary) не показано в документации,
             но ожидается.
@@ -156,6 +157,14 @@ class CardViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        responses={200: CardsListSerializer(many=True)},
+        operation_summary='Список избранных карт текущего пользователя',
+        operation_description=(
+            'Проверяет авторизацию пользователя'
+            'и выдает список его избранных карт.'
+        )
+    )
     @action(detail=False, url_path='favorite')
     def favorite(self, request, *args, **kwargs):
         """Возвращает список избранных карт."""
@@ -168,6 +177,19 @@ class CardViewSet(viewsets.ModelViewSet):
         serializer = CardsListSerializer(favorite_cards, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=CardShopCreateSerializer(),
+        responses={201: CardShopCreateSerializer()},
+        operation_summary='Добавление новой карты и магазина',
+        operation_description='''
+            Создает новую карту и новый магазин,
+            добавляет карту в список пользователя,
+            назначает его владельцем по умолчанию. \n
+            Необходимо указать номер карты и/или штрих-кода. \n
+            Поле image - string(binary) не показано в документации,
+            но ожидается.
+            '''
+    )
     @action(detail=False, methods=['POST'], url_path='new-shop',)
     def create_with_new_shop(self, request):
         user = self.request.user
@@ -191,6 +213,26 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ShopSerializer
     permission_classes = (AllowAny,)
 
+    @swagger_auto_schema(
+        responses={200: ShopSerializer()},
+        operation_summary='Список верифицированных магазинов.',
+        operation_description=(
+            'Выдает список верифицированных категорий магазинов.'
+        )
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        responses={200: ShopSerializer()},
+        operation_summary='Данные конкретного верифицированного магазина.',
+        operation_description=(
+            'Выдает данные конкретного верифицированного магазина.'
+        )
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для отображения единично и списком Категорий."""
@@ -198,10 +240,37 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
+    @swagger_auto_schema(
+        responses={200: GroupSerializer()},
+        operation_summary='Список категорий магазинов.',
+        operation_description=(
+            'Выдает список категорий магазинов.'
+        )
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        responses={200: GroupSerializer()},
+        operation_summary='Данные конкретной категории магазина.',
+        operation_description=(
+            'Выдает данные конкретной категории магазина.'
+        )
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
 
 class CreateDestroyFavViewSet(APIView):
     """Вью для удаления и добавления карты в избранное."""
 
+    @swagger_auto_schema(
+        responses={201: CardsListSerializer()},
+        operation_summary='Добавление карты в избранное',
+        operation_description='''
+            Добавляет карту в избранное.
+            '''
+    )
     def post(self, request, id):
         user = request.user
         user_card = get_object_or_404(UserCards, user=user, card__id=id)
@@ -214,6 +283,13 @@ class CreateDestroyFavViewSet(APIView):
             serializer = CardsListSerializer(card)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @swagger_auto_schema(
+        responses={200: CardsListSerializer()},
+        operation_summary='Удаление карты из избранного',
+        operation_description='''
+            Удаляет карту из избранного.
+            '''
+    )
     def delete(self, request, id):
         user = request.user
         user_card = get_object_or_404(UserCards, user=user, card__id=id)
