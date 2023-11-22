@@ -42,7 +42,7 @@ class CardEditSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
     shop = serializers.PrimaryKeyRelatedField(
         queryset=Shop.objects.all(),
-        required=False,
+        required=True,
     )
 
     class Meta:
