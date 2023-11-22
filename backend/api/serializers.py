@@ -20,20 +20,38 @@ class ShopSerializer(serializers.ModelSerializer):
     """Сериализатор магазина."""
 
     group = GroupSerializer(many=True)
+    logo = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Shop
         fields = '__all__'
+
+    def get_logo(self, obj):
+        """Возвращает абсолютный путь изображения."""
+
+        request = self.context.get('request')
+        if request and obj.logo:
+            return request.build_absolute_uri(obj.logo.url)
+        return None
 
 
 class CardSerializer(serializers.ModelSerializer):
     """Сериализатор отображения карт."""
 
     shop = ShopSerializer()
+    image = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Card
         exclude = ('users', )
+
+    def get_image(self, obj):
+        """Возвращает абсолютный путь изображения."""
+
+        request = self.context.get('request')
+        if request and obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 
 class CardEditSerializer(serializers.ModelSerializer):
@@ -62,6 +80,7 @@ class CardEditSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return CardSerializer(instance).data
+
 
 class CardsListSerializer(serializers.ModelSerializer):
     """Сериализатор списка карт пользователя."""
