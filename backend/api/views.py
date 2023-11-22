@@ -187,7 +187,11 @@ class CardViewSet(viewsets.ModelViewSet):
             select_related('card', 'card__shop').
             prefetch_related('card__shop__group')
         ).filter(favourite=True)
-        serializer = CardsListSerializer(favorite_cards, many=True)
+        serializer = CardsListSerializer(
+            favorite_cards,
+            context={'request': request},
+            many=True,
+        )
         return Response(serializer.data)
 
     @swagger_auto_schema(
@@ -222,7 +226,10 @@ class CardViewSet(viewsets.ModelViewSet):
         if request.method in ('POST', 'DELETE'):
             user_card.favourite = not user_card.favourite
             user_card.save()
-            serializer = CardsListSerializer(user_card)
+            serializer = CardsListSerializer(
+                user_card,
+                context={'request': request}
+            )
             operation_status = (
                 status.HTTP_201_CREATED if request.method == 'POST'
                 else status.HTTP_200_OK
