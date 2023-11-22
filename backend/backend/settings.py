@@ -13,7 +13,7 @@ GROUP_FILES_DIR = os.path.join(DATA_FILES_DIR, 'group.csv')
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='some_secret_key')
 
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = os.getenv('DEBUG', default=True)
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -142,8 +142,8 @@ DJOSER = {
     },
 
     'PERMISSIONS': {
-        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
-        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        'user': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user_list': ['rest_framework.permissions.IsAuthenticated'],
     },
     'HIDE_USERS': False,
 }
