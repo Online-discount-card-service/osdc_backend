@@ -50,7 +50,7 @@ class CardViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return CardsListSerializer
-        elif self.action == 'create':
+        elif self.action in ('create', 'update', 'partial_update'):
             return CardEditSerializer
         return CardSerializer
 
@@ -203,7 +203,6 @@ class CardViewSet(viewsets.ModelViewSet):
         ).filter(favourite=True)
         serializer = CardsListSerializer(
             favorite_cards,
-            context={'request': request},
             many=True,
         )
         return Response(serializer.data)
@@ -242,7 +241,6 @@ class CardViewSet(viewsets.ModelViewSet):
             user_card.save()
             serializer = CardsListSerializer(
                 user_card,
-                context={'request': request}
             )
             operation_status = (
                 status.HTTP_201_CREATED if request.method == 'POST'

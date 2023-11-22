@@ -27,11 +27,10 @@ class ShopSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_logo(self, obj):
-        """Возвращает абсолютный путь изображения."""
+        """Возвращает относительный путь изображения."""
 
-        request = self.context.get('request')
-        if request and obj.logo:
-            return request.build_absolute_uri(obj.logo.url)
+        if obj.logo:
+            return obj.logo.url
         return None
 
 
@@ -46,11 +45,10 @@ class CardSerializer(serializers.ModelSerializer):
         exclude = ('users', )
 
     def get_image(self, obj):
-        """Возвращает абсолютный путь изображения."""
+        """Возвращает относительный путь изображения."""
 
-        request = self.context.get('request')
-        if request and obj.image:
-            return request.build_absolute_uri(obj.image.url)
+        if obj.image:
+            return obj.image.url
         return None
 
 
