@@ -60,6 +60,8 @@ class CardEditSerializer(serializers.ModelSerializer):
                 'Необходимо указать номер карты и/или штрих-кода')
         return data
 
+    def to_representation(self, instance):
+        return CardSerializer(instance).data
 
 class CardsListSerializer(serializers.ModelSerializer):
     """Сериализатор списка карт пользователя."""
