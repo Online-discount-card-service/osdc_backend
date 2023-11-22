@@ -4,16 +4,13 @@ from djoser.views import UserViewSet
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import Card, Group, Shop, UserCards
 
+from .permissions import IsCardsUser
 from .serializers import (
     CardEditSerializer,
     CardSerializer,
@@ -30,7 +27,7 @@ User = get_user_model()
 class UserViewSet(UserViewSet):
     """Вьюсет для данных пользователя. Возможны просмотр и редактирование."""
 
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     @action(["get", "patch"], detail=False)
     def me(self, request, *args, **kwargs):
@@ -46,7 +43,7 @@ class CardViewSet(viewsets.ModelViewSet):
 
     queryset = Card.objects.all()
     serializer_class = CardSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsCardsUser,)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -81,6 +78,17 @@ class CardViewSet(viewsets.ModelViewSet):
             owner=True,
             favourite=False,
         )
+
+    def perform_destroy(self, instance):
+        id = instance.id
+        user = self.request.user
+        user_card = UserCards.objects.get(user=user, card__id=id)
+        if user_card.owner:
+            card = Card.objects.get(id=id)
+            usercards = UserCards.objects.filter(card__id=id)
+            usercards.delete()
+            card.delete()
+        user_card.delete()
 
     @swagger_auto_schema(
         responses={200: CardsListSerializer(many=True)},
@@ -197,6 +205,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = (AllowAny,)
 
 
 class CreateDestroyFavViewSet(APIView):
