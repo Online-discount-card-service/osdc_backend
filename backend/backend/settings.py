@@ -13,7 +13,7 @@ GROUP_FILES_DIR = os.path.join(DATA_FILES_DIR, 'group.csv')
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='some_secret_key')
 
-DEBUG = os.getenv('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', default=False)
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
