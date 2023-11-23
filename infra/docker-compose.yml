@@ -7,12 +7,12 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data/
 
-#  frontend:
-#    build:
-#      context: .
-#      dockerfile: ./Dockerfile_front
-#    volumes:
-#      - ./frontend-shared:/app/result_build/
+  frontend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_front
+    volumes:
+      - ./frontend-shared:/app/result_build/
 
   backend:
     build: ../backend/
@@ -40,12 +40,12 @@ services:
         - NGINX_HOST=${NGINX_HOST}
     volumes:
       - ./:/etc/nginx/templates
-      - ./frontend_shared:/usr/share/nginx/html
+      - ./frontend-shared:/usr/share/nginx/html
       - static:/var/html/static/
       - media:/var/html/media/
     depends_on:
       - backend
-#      - frontend
+      - frontend
 
 volumes:
     pg_data:
