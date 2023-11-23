@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from djoser.permissions import CurrentUserOrAdmin
 from django.shortcuts import get_object_or_404
 from djoser.views import TokenDestroyView, UserViewSet
 from drf_yasg.utils import swagger_auto_schema
@@ -26,7 +27,7 @@ User = get_user_model()
 class UserViewSet(UserViewSet):
     """Эндпоинт для просмотра и управления пользователями."""
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (CurrentUserOrAdmin,)
 
     @action(["get", "patch"], detail=False)
     def me(self, request, *args, **kwargs):
