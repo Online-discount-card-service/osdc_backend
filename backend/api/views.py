@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from djoser.views import TokenDestroyView, UserViewSet
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
@@ -38,6 +38,17 @@ class UserViewSet(UserViewSet):
             return self.retrieve(request, *args, **kwargs)
         elif request.method == "PATCH":
             return self.partial_update(request, *args, **kwargs)
+
+
+class TokenDestroyView(TokenDestroyView):
+    """Эндпоинт для выхода из учетной записи."""
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response(
+            {"Message": "Вы успешно вышли из учетной записи."},
+            status=status.HTTP_200_OK
+        )
 
 
 class CardViewSet(viewsets.ModelViewSet):
@@ -154,7 +165,11 @@ class CardViewSet(viewsets.ModelViewSet):
             'Удаляет все данные о карте.')
     )
     def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
+        super().destroy(request, *args, **kwargs)
+        return Response(
+            {"Message": "Карта успешно удалена."},
+            status=status.HTTP_200_OK
+        )
 
     @swagger_auto_schema(
         request_body=CardShopCreateSerializer(),
