@@ -20,20 +20,36 @@ class ShopSerializer(serializers.ModelSerializer):
     """Сериализатор магазина."""
 
     group = GroupSerializer(many=True)
+    logo = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Shop
         fields = '__all__'
+
+    def get_logo(self, obj):
+        """Возвращает относительный путь изображения."""
+
+        if obj.logo:
+            return obj.logo.url
+        return None
 
 
 class CardSerializer(serializers.ModelSerializer):
     """Сериализатор отображения карт."""
 
     shop = ShopSerializer()
+    image = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Card
         exclude = ('users', )
+
+    def get_image(self, obj):
+        """Возвращает относительный путь изображения."""
+
+        if obj.image:
+            return obj.image.url
+        return None
 
 
 class CardEditSerializer(serializers.ModelSerializer):
@@ -42,7 +58,7 @@ class CardEditSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
     shop = serializers.PrimaryKeyRelatedField(
         queryset=Shop.objects.all(),
-        required=False,
+        required=True,
     )
 
     class Meta:
@@ -59,6 +75,9 @@ class CardEditSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Необходимо указать номер карты и/или штрих-кода')
         return data
+
+    def to_representation(self, instance):
+        return CardSerializer(instance).data
 
 
 class CardsListSerializer(serializers.ModelSerializer):
@@ -87,8 +106,8 @@ class CardShopCreateSerializer(CardEditSerializer):
     shop = ShopCreateSerializer()
 
     def create(self, validated_data):
-        shopname = validated_data.pop('shop')
-        shop = Shop.objects.create(name=shopname['name'])
+        shop_name = validated_data.pop('shop')
+        shop = Shop.objects.create(name=shop_name['name'])
         card = Card.objects.create(shop=shop, **validated_data)
         return card
 
