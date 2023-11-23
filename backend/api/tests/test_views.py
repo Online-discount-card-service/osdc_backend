@@ -23,8 +23,7 @@ class CardAPITestCase(APITests):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_retrieve_card(self):
-        response = self.client.get(reverse('api:card-detail', self.card.id))  # ???????
-        # response = self.client.get(f'/api/v1/cards/{self.card.id}/')
+        response = self.client.get(f'/api/v1/cards/{self.card.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_card(self):

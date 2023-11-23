@@ -62,10 +62,10 @@ class APITests(APITestCase):
         }
         cls.user_card = UserCards.objects.create(**user_card_data)
         cls.CARD_LIST = reverse('api:card-list')
-        cls.CARD_DETAIL = reverse(
-            'api:card-detail',
-            kwargs={'card-id': f'{cls.card.id}'}
-        )
+        # cls.CARD_DETAIL = reverse(
+        #     'api:card-detail',
+        #     kwargs={'card-id': f'{cls.card.id}'}
+        # )
         cls.SHOP_LIST = reverse('api:shop-list')
         cls.GROUP_LIST = reverse('api:group-list')
         cls.USER_ME = reverse('api:user-me')
