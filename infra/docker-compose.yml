@@ -40,7 +40,7 @@ services:
         - NGINX_HOST=${NGINX_HOST}
     volumes:
       - ./:/etc/nginx/templates
-      - ./frontend-shared:/usr/share/nginx/html
+      - ./frontend_shared:/usr/share/nginx/html
       - static:/var/html/static/
       - media:/var/html/media/
     depends_on:

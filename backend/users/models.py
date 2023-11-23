@@ -80,4 +80,4 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
     def __str__(self):
-        return self.email
+        return f'{self.name}({self.email})'
