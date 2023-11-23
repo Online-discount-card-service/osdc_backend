@@ -85,8 +85,6 @@ class CardViewSet(viewsets.ModelViewSet):
         user_card = UserCards.objects.get(user=user, card__id=id)
         if user_card.owner:
             card = Card.objects.get(id=id)
-            usercards = UserCards.objects.filter(card__id=id)
-            usercards.delete()
             card.delete()
         user_card.delete()
 

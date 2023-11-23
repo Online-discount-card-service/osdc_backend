@@ -143,9 +143,8 @@ DJOSER = {
 
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
-        'user_list': ['rest_framework.permissions.IsAuthenticated'],
     },
-    'HIDE_USERS': False,
+    'HIDE_USERS': True,
 }
 
 # TODO убрать на продакшене
