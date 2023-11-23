@@ -157,26 +157,6 @@ class CardViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        responses={200: CardsListSerializer(many=True)},
-        operation_summary='Список избранных карт текущего пользователя',
-        operation_description=(
-            'Проверяет авторизацию пользователя'
-            'и выдает список его избранных карт.'
-        )
-    )
-    @action(detail=False, url_path='favorite')
-    def favorite(self, request, *args, **kwargs):
-        """Возвращает список избранных карт."""
-
-        favorite_cards = (
-            self.request.user.cards.
-            select_related('card', 'card__shop').
-            prefetch_related('card__shop__group')
-        ).filter(favourite=True)
-        serializer = CardsListSerializer(favorite_cards, many=True)
-        return Response(serializer.data)
-
-    @swagger_auto_schema(
         request_body=CardShopCreateSerializer(),
         responses={201: CardShopCreateSerializer()},
         operation_summary='Добавление новой карты и магазина',
@@ -328,45 +308,3 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
-
-
-class CreateDestroyFavViewSet(APIView):
-    """Вью для удаления и добавления карты в избранное."""
-
-    @swagger_auto_schema(
-        responses={201: CardsListSerializer()},
-        operation_summary='Добавление карты в избранное',
-        operation_description='''
-            Добавляет карту в избранное.
-            '''
-    )
-    def post(self, request, id):
-        user = request.user
-        user_card = get_object_or_404(UserCards, user=user, card__id=id)
-        if user_card.favourite:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            user_card.favourite = True
-            user_card.save()
-            card = UserCards.objects.get(user=user, card__id=id)
-            serializer = CardsListSerializer(card)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @swagger_auto_schema(
-        responses={200: CardsListSerializer()},
-        operation_summary='Удаление карты из избранного',
-        operation_description='''
-            Удаляет карту из избранного.
-            '''
-    )
-    def delete(self, request, id):
-        user = request.user
-        user_card = get_object_or_404(UserCards, user=user, card__id=id)
-        if not user_card.favourite:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            user_card.favourite = False
-            user_card.save()
-            card = UserCards.objects.get(user=user, card__id=id)
-            serializer = CardsListSerializer(card)
-            return Response(serializer.data, status=status.HTTP_200_OK)
