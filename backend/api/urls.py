@@ -4,7 +4,13 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
-from .views import CardViewSet, GroupViewSet, ShopViewSet, UserViewSet
+from .views import (
+    CardViewSet,
+    GroupViewSet,
+    ShopViewSet,
+    TokenDestroyView,
+    UserViewSet,
+)
 
 
 app_name = 'api'
@@ -31,6 +37,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('v1/', include(router.urls)),
+    path('v1/auth/token/logout/', TokenDestroyView.as_view(), name="logout"),
     path('v1/auth/', include('djoser.urls.authtoken')),
     path(
         'docs/swagger/',
