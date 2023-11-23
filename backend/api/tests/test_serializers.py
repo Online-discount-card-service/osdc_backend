@@ -1,5 +1,4 @@
 from api.serializers import (CardEditSerializer, CardsListSerializer,
-                             CardSerializer, GroupSerializer, ShopSerializer,
                              UserCustomCreateSerializer, UserReadSerializer)
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -7,30 +6,14 @@ from rest_framework import exceptions
 
 from core.models import Card, Group, Shop, UserCards
 
+from .fixtures import APITests
+
 
 User = get_user_model()
 
 
-class CardSerializerTest(TestCase):
+class CardSerializerTest(APITests):
     """Тестирование сериализатора CardSerializer."""
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.shop = Shop.objects.create(
-            name='TestShop',
-            color='pink',
-        )
-        cls.card = Card.objects.create(
-            name='TestCard',
-            shop=cls.shop,
-            image='path/to/image.jpg',
-            card_number='123456789',
-            barcode_number='987654321',
-            encoding_type='EAN-13',
-            usage_counter=1,
-        )
-        cls.serializer = CardSerializer(instance=cls.card)
 
     def test_serializer_fields(self):
         expected_fields = {
@@ -44,61 +27,52 @@ class CardSerializerTest(TestCase):
             'encoding_type',
             'usage_counter',
         }
-        self.assertEqual(set(self.serializer.data.keys()), expected_fields)
+        self.assertEqual(
+            set(self.card_serializer.data.keys()),
+            expected_fields,
+        )
 
     def test_serializer_shop_representation(self):
+        shop = self.card_serializer.data['shop']
         expected_representation = {
             'id': self.shop.id,
-            'group': [],
-            'name': 'TestShop',
+            'group': shop['group'],
+            'name': 'Test Shop',
             'logo': None,
             'color': 'pink',
             'validation': False,
         }
-        self.assertEqual(
-            self.serializer.data['shop'],
-            expected_representation
-        )
+        self.assertEqual(shop, expected_representation)
 
 
-class GroupSerializerTest(TestCase):
+class GroupSerializerTest(APITests):
     """Тестирование сериализатора Group."""
-
-    def setUp(self):
-        self.group = Group.objects.create(name='Test Group 1')
-        self.serializer = GroupSerializer(instance=self.group)
 
     def test_serializer_data(self):
         expected_data = {
             'id': 1,
-            'name': 'Test Group 1',
+            'name': 'Test Group',
         }
-        self.assertEqual(self.serializer.data, expected_data)
+        self.assertEqual(self.group_serializer.data, expected_data)
 
 
-class ShopSerializerTest(TestCase):
+class ShopSerializerTest(APITests):
     """Тестирование сериализатора Shop."""
 
-    def setUp(self):
-        self.shop = Shop.objects.create(
-            name='Test Shop 1',
-            color='green',
-        )
-        self.serializer = ShopSerializer(instance=self.shop)
-
     def test_serializer_data(self):
+        shop = self.shop_serializer.data
         expected_data = {
             'id': self.shop.id,
-            'group': [],
-            'name': 'Test Shop 1',
+            'group': shop['group'],
+            'name': 'Test Shop',
             'logo': None,
-            'color': 'green',
+            'color': 'pink',
             'validation': False,
         }
-        self.assertEqual(self.serializer.data, expected_data)
+        self.assertEqual(shop, expected_data)
 
 
-class CardEditAndListSerializerTest(TestCase):
+class CardEditAndListSerializerTest(APITests):
     """Тестирование сериализатора CardEdit и CardList."""
 
     @classmethod
@@ -106,23 +80,12 @@ class CardEditAndListSerializerTest(TestCase):
         super().setUpClass()
         cls.user = User.objects.create(
             email='test@example.com',
-            username='testuser',
+            name='testuser',
             password='Qwe1346',
-            phone_number='7248248742'
-        )
-        cls.shop = Shop.objects.create(
-            name='TestShop',
-            color='yellow',
-        )
-        cls.card = Card.objects.create(
-            name='Test Card 1',
-            shop=cls.shop,
-            image='path/to/image.jpg',
-            card_number='123456789',
-            barcode_number='987654321',
+            phone_number='7248248742',
         )
         cls.broken_card = Card.objects.create(
-            name='Test Card 1',
+            name='Broken Card',
             shop=cls.shop,
             image='path/to/image.jpg',
             card_number='',
@@ -137,35 +100,38 @@ class CardEditAndListSerializerTest(TestCase):
         cls.broken_serializer = CardEditSerializer(instance=cls.broken_card)
 
     def test_list_serializer_data(self):
+        list_data = self.list_serializer.data
         expected_data = {
             'card': {
                 'id': self.card.id,
-                'shop': self.list_serializer.data['card']['shop'],
-                'name': 'Test Card 1',
-                'pub_date': self.list_serializer.data['card']['pub_date'],
+                'shop': list_data['card']['shop'],
                 'image': '/media/path/to/image.jpg',
+                'name': 'Test Card',
+                'pub_date': list_data['card']['pub_date'],
                 'card_number': '123456789',
                 'barcode_number': '987654321',
                 'encoding_type': 'ean-13',
-                'usage_counter': 0,
+                'usage_counter': 1,
             },
             'owner': True,
             'favourite': False,
         }
-        self.assertEqual(self.list_serializer.data, expected_data)
+        self.assertEqual(list_data, expected_data)
 
     def test_edit_serializer_data(self):
+        edit_data = self.edit_serializer.data
         expected_data = {
             'id': self.card.id,
+            'shop': edit_data['shop'],
             'image': '/media/path/to/image.jpg',
-            'shop': self.shop.id,
-            'name': 'Test Card 1',
-            'pub_date': self.edit_serializer.data['pub_date'],
+            'name': 'Test Card',
+            'pub_date': edit_data['pub_date'],
             'card_number': '123456789',
             'barcode_number': '987654321',
             'encoding_type': 'ean-13',
+            'usage_counter': 1,
         }
-        self.assertEqual(self.edit_serializer.data, expected_data)
+        self.assertEqual(edit_data, expected_data)
 
     def test_validation_error(self):
         error_message = 'Необходимо указать номер карты и/или штрих-кода'
@@ -185,9 +151,9 @@ class UserSerializersTest(TestCase):
     def setUp(self):
         self.user_data = {
             'email': 'test_email@example.com',
-            'username': 'testUsERS',
+            'name': 'testUsERS',
             'phone_number': '9123456756',
-            'password': 'testpassWORD',
+            'password': 'testpassWORD12',
         }
 
     def test_user_create_serializer(self):

@@ -83,10 +83,10 @@ class Card(models.Model):
     )
     shop = models.ForeignKey(
         Shop,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         verbose_name='Магазин',
-        blank=True,
-        null=True
+        blank=False,
+        null=False,
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата добавления карты',
@@ -133,7 +133,7 @@ class Card(models.Model):
         verbose_name_plural = 'Карты'
 
     def __str__(self):
-        return self.name
+        return f'{self.name}({self.shop})'
 
 
 class UserCards(models.Model):
@@ -152,7 +152,7 @@ class UserCards(models.Model):
         verbose_name='Карты'
     )
     owner = models.BooleanField(
-        verbose_name='Принадлежность',
+        verbose_name='Владелец карты',
         blank=True,
         default=True,
     )
