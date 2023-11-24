@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from djoser.permissions import CurrentUserOrAdmin
 from django.shortcuts import get_object_or_404
+from djoser.permissions import CurrentUserOrAdmin
 from djoser.views import TokenDestroyView, UserViewSet
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
@@ -168,8 +169,11 @@ class CardViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         responses={204: None},
         operation_summary='Удаление карты',
-        operation_description=(
-            'Удаляет все данные о карте.')
+        operation_description='''
+            Если пользователь является владельцем карты,
+            удаляет все данные о карте. \n
+            Если не является, удаляет карту из списка пользователя. \n
+        '''
     )
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
@@ -185,13 +189,18 @@ class CardViewSet(viewsets.ModelViewSet):
         operation_description='''
             Создает новую карту и новый магазин,
             добавляет карту в список пользователя,
-            назначает его владельцем по умолчанию. \n
+            назначает его владельцем. \n
             Необходимо указать номер карты и/или штрих-кода. \n
             Поле image - string(binary) не показано в документации,
             но ожидается.
             '''
     )
-    @action(detail=False, methods=['POST'], url_path='new-shop',)
+    @action(
+        detail=False,
+        methods=['POST'],
+        url_path='new-shop',
+        name='new-shop',
+    )
     def create_with_new_shop(self, request):
         user = self.request.user
         serializer = CardShopCreateSerializer(data=request.data)
@@ -231,6 +240,7 @@ class CardViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         methods=['POST'],
+        request_body=openapi.Schema(type=openapi.TYPE_OBJECT),
         responses={201: CardsListSerializer()},
         operation_summary='Добавление карты в избранное',
         operation_description='''
