@@ -1,7 +1,6 @@
 import shutil
 import tempfile
 
-from api.serializers import CardSerializer, GroupSerializer, ShopSerializer
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -24,23 +23,22 @@ class APITests(APITestCase):
 
         cls.UPLOADED_GIF = SimpleUploadedFile(
             name='small.gif',
-            content=(
-                b'\x47\x49\x46\x38\x39\x61\x02\x00'
-                b'\x01\x00\x80\x00\x00\x00\x00\x00'
-                b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-                b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-                b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-                b'\x0A\x00\x3B'
-            ),
+            content=b'\x47\x49\x46\x38\x39\x61\x02\x00\x01\x00\x80'
+                    b'\x00\x00\x00\x00\x00\xFF\xFF\xFF\x21\xF9\x04'
+                    b'\x00\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x02'
+                    b'\x00\x01\x00\x00\x02\x02\x0C\x0A\x00\x3B',
             content_type='image/gif',
         )
         cls.CARDS_USER_HAVE = 17
+        # NOTE: CARDS_USER_OWN должно быть
+        # меньше хотя бы на 1 чем CARDS_USER_HAVE
         cls.CARDS_USER_OWN = 10
         cls.CARDS_USER_FAV = 5
         cls.CARDS_USER_NOT_HAVE = 3
         cls.SHOPS = 9
         cls.SHOPS_VERIFY = 5
         cls.GROUPS = 5
+        cls.USERS = 3
 
         for group_num in range(cls.GROUPS):
             Group.objects.create(name=f'Test Group #{group_num}')
@@ -68,33 +66,39 @@ class APITests(APITestCase):
             )
         cls.card = Card.objects.order_by().first()
 
-        cls.user = User.objects.create_user(email='user@example.com')
+        for user_num in range(cls.USERS):
+            cls.user = User.objects.create_user(
+                email=f'user{user_num}@example.com',
+                password=f'TestPass{user_num}',
+                phone_number=f'+7999999999{user_num}',
+            )
+        cls.user = User.objects.order_by().first()
 
         for card_num in range(cls.CARDS_USER_HAVE):
             UserCards.objects.create(
                 user=cls.user,
                 card=Card.objects.get(card_number=f'{card_num}'),
                 owner=(card_num < cls.CARDS_USER_OWN),
-                favorite=(card_num < cls.CARDS_USER_FAV),
+                favourite=(card_num < cls.CARDS_USER_FAV),
             )
+        cls.card_user_not_own = Card.objects.get(
+            card_number=f'{cls.CARDS_USER_OWN}'
+        )
+        cls.card_user_not_fav = Card.objects.get(
+            card_number=f'{cls.CARDS_USER_FAV}'
+        )
 
-        cls.group_serializer = GroupSerializer(instance=cls.group)
-        cls.shop_serializer = ShopSerializer(instance=cls.shop)
-        cls.card_serializer = CardSerializer(instance=cls.card)
-
-        cls.CARD_LIST_URL = reverse('api:card-list')
+        cls.CARDS_URL = reverse('api:card-list')
         cls.CARD_DETAIL_URL = reverse(
             'api:card-detail',
             kwargs={'pk': f'{cls.card.id}'}
         )
-        cls.SHOP_LIST_URL = reverse('api:shop-list')
         cls.GROUP_LIST_URL = reverse('api:group-list')
-        cls.USER_ME_URL = reverse('api:user-me')
 
     def setUp(self):
         self.guest_client = APIClient()
-        self.client = APIClient()
-        self.client.force_login(self.self.user)
+        self.auth_client = APIClient()
+        self.auth_client.force_authenticate(user=self.user)
 
     @classmethod
     def tearDownClass(cls):
