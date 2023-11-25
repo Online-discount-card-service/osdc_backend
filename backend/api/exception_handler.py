@@ -32,8 +32,8 @@ def custom_exception_handler(exc: APIException, context):
     if exc.status_code in ERROR_MESSAGES:
         response.data['message'] = ERROR_MESSAGES.get(exc.status_code)
     elif 500 <= exc.status_code <= 599:
-        response.data['message'] = 'Ошибка сервера.'
+        response.data['Message'] = 'Ошибка сервера.'
     else:
-        response.data['message'] = 'Что-то пошло не так.'
+        response.data['Message'] = 'Что-то пошло не так.'
 
     return response
