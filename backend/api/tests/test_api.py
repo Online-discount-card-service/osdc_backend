@@ -202,8 +202,8 @@ class EndpointsTestCase(APITests):
         new_card = Card.objects.exclude(pk__in=old_cards_pk).last()
         self.assert_user_has_new_card(new_card.pk)
 
-    def test_card_edit(self):
-        """Проверка редактирования карты."""
+    def test_card_edit_by_owner(self):
+        """Проверка редактирования карты владельцем."""
 
         response = self.auth_client.patch(
             self.CARD_DETAIL_URL,
@@ -219,6 +219,24 @@ class EndpointsTestCase(APITests):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.card.refresh_from_db()
         self.assertEqual(self.card.name, 'New name')
+
+    def test_card_edit_by_not_owner(self):
+        """Проверка редактирования карты не владельцем."""
+
+        response = self.auth_client.patch(
+            reverse(
+                'api:card-detail',
+                kwargs={'pk': self.card_user_not_own.pk}),
+            {
+                'name': 'New name',
+                'shop': self.shop.id,
+                'image': self.UPLOADED_GIF.open(),
+                'card_number': '123456789012',
+                'barcode_number': '123456789012',
+                'encoding_type': 'ean-13',
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_card_delete_by_owner(self):
         """Проверка удаления карты ее владельцем."""
