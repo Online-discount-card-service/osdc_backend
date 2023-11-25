@@ -51,7 +51,7 @@ class User(AbstractUser):
         blank=False,
         max_length=MAX_LENGTH_NAME,
         validators=[RegexValidator(
-            regex=r'^[a-zA-Zа-яА-Я\s-]{1,60}$',
+            regex=r'^[a-zA-Zа-яА-ЯёЁ\s-]{1,60}$',
             message='Имя может содержать только буквы, пробелы и тире',
         )]
     )
