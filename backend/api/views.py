@@ -19,6 +19,7 @@ from .serializers import (
     CardsListSerializer,
     GroupSerializer,
     ShopSerializer,
+    StatisticsSerializer,
 )
 
 
@@ -283,6 +284,20 @@ class CardViewSet(viewsets.ModelViewSet):
         raise serializers.ValidationError(
             {"errors": "Что-то пошло не так."}
         )
+
+    @action(detail=True, methods=['patch'],)
+    def statistics(self, request, pk):
+        serializer = StatisticsSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            user_card = get_object_or_404(UserCards, user=user, card__id=pk)
+            user_card.usage_counter = (
+                user_card.usage_counter + request.data['usage_counter']
+            )
+            user_card.save()
+            serializer = CardsListSerializer(user_card)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
