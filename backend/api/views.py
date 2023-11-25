@@ -213,7 +213,7 @@ class CardViewSet(viewsets.ModelViewSet):
                 favourite=False,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        raise serializers.ValidationError(serializer.errors)
 
     @swagger_auto_schema(
         responses={200: CardsListSerializer(many=True)},
@@ -267,7 +267,8 @@ class CardViewSet(viewsets.ModelViewSet):
                 (user_card.favourite and request.method == 'POST')
                 or (not user_card.favourite and request.method == 'DELETE')
         ):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            raise serializers.ValidationError(
+                'Статус карты уже соответствует запрашиваемому.')
         if request.method in ('POST', 'DELETE'):
             user_card.favourite = not user_card.favourite
             user_card.save()
