@@ -286,6 +286,16 @@ class CardViewSet(viewsets.ModelViewSet):
             {"errors": "Что-то пошло не так."}
         )
 
+    @swagger_auto_schema(
+        methods=['PATCH'],
+        request_body=StatisticsSerializer(),
+        responses={200: CardsListSerializer()},
+        operation_summary='Увеличение счётчика использования',
+        operation_description='''
+            Увеличивает счётчик использования на число,
+            переданное в теле запроса.
+            '''
+    )
     @action(detail=True, methods=['patch'],)
     def statistics(self, request, pk):
         serializer = StatisticsSerializer(data=request.data)
