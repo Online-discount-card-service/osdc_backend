@@ -62,7 +62,6 @@ class APITests(APITestCase):
                 card_number=f'{card_num}',
                 barcode_number=f'{card_num}',
                 encoding_type='ean-13',
-                usage_counter=1,
             )
         cls.card = Card.objects.order_by().first()
 

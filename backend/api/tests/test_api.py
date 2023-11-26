@@ -12,7 +12,7 @@ User = get_user_model()
 
 
 class EndpointsTestCase(APITests):
-    """Тестирование ручек users."""
+    """Тестирование ручек."""
 
     def test_user_list_accessibility_for_guest(self):
         """Проверка недоступности ручки user-list без авторизации."""
@@ -77,17 +77,17 @@ class EndpointsTestCase(APITests):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         expected_fields = [
-            'card', 'owner', 'favourite',
+            'card', 'owner', 'favourite', 'usage_counter',
         ]
         expected_card_fields = [
             'id', 'shop', 'image', 'name', 'pub_date', 'card_number',
-            'barcode_number', 'encoding_type', 'usage_counter',
+            'barcode_number', 'encoding_type',
         ]
         expected_shop_fields = [
-            'id', 'group', 'logo', 'name', 'color', 'validation'
+            'id', 'group', 'logo', 'name', 'color', 'validation',
         ]
         expected_group_fields = [
-            'id', 'name'
+            'id', 'name',
         ]
         for card_data in response.data:
             self.assertTrue(
@@ -126,7 +126,7 @@ class EndpointsTestCase(APITests):
 
         expected_card_fields = [
             'id', 'shop', 'image', 'name', 'pub_date', 'card_number',
-            'barcode_number', 'encoding_type', 'usage_counter',
+            'barcode_number', 'encoding_type',
         ]
         expected_shop_fields = [
             'id', 'group', 'logo', 'name', 'color', 'validation'
@@ -255,7 +255,7 @@ class EndpointsTestCase(APITests):
         )
 
     def test_card_delete_by_not_owner(self):
-        """Проверка удаления карты ее владельцем."""
+        """Проверка удаления карты не ее владельцем."""
 
         response = self.auth_client.delete(reverse(
             'api:card-detail',
@@ -312,7 +312,7 @@ class EndpointsTestCase(APITests):
         self.assertEqual(len(response.data), self.SHOPS_VERIFY)
 
     def test_group_list_accessibility_for_guest(self):
-        """Проверка выдачи списка проверенных магазинов гостю."""
+        """Проверка выдачи списка категорий гостю."""
 
         response = self.guest_client.get(reverse('api:group-list'))
         self.assertEqual(len(response.data), self.GROUPS)
