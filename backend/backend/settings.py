@@ -13,7 +13,7 @@ GROUP_FILES_DIR = os.path.join(DATA_FILES_DIR, 'group.csv')
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='some_secret_key')
 
-DEBUG = os.getenv('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', default=False)
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -131,6 +131,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'EXCEPTION_HANDLER': 'api.exception_handler.custom_exception_handler',
 }
 
 DJOSER = {
