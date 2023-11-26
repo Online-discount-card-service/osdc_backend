@@ -273,6 +273,24 @@ class EndpointsTestCase(APITests):
             'Карту может удалить не ее владелец.'
         )
 
+    def test_card_statistics(self):
+        """Проверка увеличения счетика использования карты."""
+
+        response = self.auth_client.patch(
+            reverse(
+                'api:card-statistics',
+                kwargs={'pk': self.card.pk}
+            ),
+            {
+                'usage_counter': "157",
+            })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            UserCards.objects.filter(
+                user=self.user, card__pk=self.card.pk).first().usage_counter,
+            157
+        )
+
     def test_cards_favorite_list_count(self):
         """Проверка количества карт в избранных."""
 
