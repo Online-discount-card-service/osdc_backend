@@ -146,7 +146,13 @@ DJOSER = {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
     },
     'HIDE_USERS': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
 }
+
+# TODO убрать, добавить реальное отправление писем
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
 
 # TODO убрать на продакшене
 # CORS_ALLOW_ALL_ORIGINS = True
