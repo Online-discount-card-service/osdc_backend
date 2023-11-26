@@ -206,7 +206,7 @@ class CardViewSet(viewsets.ModelViewSet):
     def create_with_new_shop(self, request):
         user = self.request.user
         serializer = CardShopCreateSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             card = serializer.save()
             UserCards.objects.create(
                 user=user,
@@ -215,7 +215,7 @@ class CardViewSet(viewsets.ModelViewSet):
                 favourite=False,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        raise serializers.ValidationError(serializer.errors)
+        # raise serializers.ValidationError(serializer.errors)
 
     @swagger_auto_schema(
         responses={200: CardsListSerializer(many=True)},
@@ -301,7 +301,7 @@ class CardViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'], name='statistics')
     def statistics(self, request, pk):
         serializer = StatisticsSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = request.user
             user_card = get_object_or_404(UserCards, user=user, card__id=pk)
             new_statistics = request.data['usage_counter']
@@ -311,7 +311,7 @@ class CardViewSet(viewsets.ModelViewSet):
                 serializer = CardsListSerializer(user_card)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             raise StatisticsError
-        return serializers.ValidationError(serializer.errors)
+        # return serializers.ValidationError(serializer.errors)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
