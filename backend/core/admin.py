@@ -44,7 +44,6 @@ class CardAdmin(admin.ModelAdmin):
         'card_number',
         'barcode_number',
         'encoding_type',
-        'usage_counter'
     )
     empty_value_display = '-пусто-'
     search_fields = (
@@ -68,7 +67,7 @@ class CardAdmin(admin.ModelAdmin):
             'fields': (
                 ('name', 'shop',),
                 ('card_number', 'barcode_number', 'encoding_type',),
-                ('usage_counter', 'pub_date',),
+                ('pub_date',),
                 ('image',),
             )
         }),
@@ -84,6 +83,7 @@ class UserCardsAdmin(admin.ModelAdmin):
         'user',
         'card',
         'owner',
+        'usage_counter'
     )
     empty_value_display = '-пусто-'
     search_fields = (

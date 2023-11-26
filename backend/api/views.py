@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from djoser.permissions import CurrentUserOrAdmin
 from django.shortcuts import get_object_or_404
+from djoser.permissions import CurrentUserOrAdmin
 from djoser.views import TokenDestroyView, UserViewSet
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
 
+from .exceptions import StatisticsError
 from .permissions import IsCardsUser
 from .serializers import (
     CardEditSerializer,
@@ -18,6 +20,7 @@ from .serializers import (
     CardsListSerializer,
     GroupSerializer,
     ShopSerializer,
+    StatisticsSerializer,
 )
 
 
@@ -168,8 +171,11 @@ class CardViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         responses={204: None},
         operation_summary='Удаление карты',
-        operation_description=(
-            'Удаляет все данные о карте.')
+        operation_description='''
+            Если пользователь является владельцем карты,
+            удаляет все данные о карте. \n
+            Если не является, удаляет карту из списка пользователя. \n
+        '''
     )
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
@@ -185,13 +191,18 @@ class CardViewSet(viewsets.ModelViewSet):
         operation_description='''
             Создает новую карту и новый магазин,
             добавляет карту в список пользователя,
-            назначает его владельцем по умолчанию. \n
+            назначает его владельцем. \n
             Необходимо указать номер карты и/или штрих-кода. \n
             Поле image - string(binary) не показано в документации,
             но ожидается.
             '''
     )
-    @action(detail=False, methods=['POST'], url_path='new-shop',)
+    @action(
+        detail=False,
+        methods=['POST'],
+        url_path='new-shop',
+        name='new-shop',
+    )
     def create_with_new_shop(self, request):
         user = self.request.user
         serializer = CardShopCreateSerializer(data=request.data)
@@ -204,7 +215,7 @@ class CardViewSet(viewsets.ModelViewSet):
                 favourite=False,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        raise serializers.ValidationError(serializer.errors)
 
     @swagger_auto_schema(
         responses={200: CardsListSerializer(many=True)},
@@ -231,6 +242,7 @@ class CardViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         methods=['POST'],
+        request_body=openapi.Schema(type=openapi.TYPE_OBJECT),
         responses={201: CardsListSerializer()},
         operation_summary='Добавление карты в избранное',
         operation_description='''
@@ -257,7 +269,8 @@ class CardViewSet(viewsets.ModelViewSet):
                 (user_card.favourite and request.method == 'POST')
                 or (not user_card.favourite and request.method == 'DELETE')
         ):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            raise serializers.ValidationError(
+                'Статус карты уже соответствует запрашиваемому.')
         if request.method in ('POST', 'DELETE'):
             user_card.favourite = not user_card.favourite
             user_card.save()
@@ -273,6 +286,32 @@ class CardViewSet(viewsets.ModelViewSet):
         raise serializers.ValidationError(
             {"errors": "Что-то пошло не так."}
         )
+
+    @swagger_auto_schema(
+        methods=['PATCH'],
+        request_body=StatisticsSerializer(),
+        responses={200: CardsListSerializer()},
+        operation_summary='Увеличение счётчика использования',
+        operation_description='''
+            Присваивает счётчику использования карты число,
+            переданное в теле запроса.
+            Доступно только увеличение счётчика.
+            '''
+    )
+    @action(detail=True, methods=['patch'],)
+    def statistics(self, request, pk):
+        serializer = StatisticsSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            user_card = get_object_or_404(UserCards, user=user, card__id=pk)
+            new_statistics = request.data['usage_counter']
+            if user_card.usage_counter < new_statistics:
+                user_card.usage_counter = new_statistics
+                user_card.save()
+                serializer = CardsListSerializer(user_card)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            raise StatisticsError
+        return serializers.ValidationError(serializer.errors)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):

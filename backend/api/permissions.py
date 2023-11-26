@@ -3,6 +3,7 @@ from rest_framework import permissions
 
 from core.models import UserCards
 
+
 class IsCardsUser(permissions.BasePermission):
     """Разрешения: объект можно читать, редактировать может только автор."""
 
