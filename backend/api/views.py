@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
 
+from .exceptions import StatisticsError
 from .permissions import IsCardsUser
 from .serializers import (
     CardEditSerializer,
@@ -292,8 +293,9 @@ class CardViewSet(viewsets.ModelViewSet):
         responses={200: CardsListSerializer()},
         operation_summary='Увеличение счётчика использования',
         operation_description='''
-            Увеличивает счётчик использования на число,
+            Присваивает счётчику использования карты число,
             переданное в теле запроса.
+            Доступно только увеличение счётчика.
             '''
     )
     @action(detail=True, methods=['patch'],)
@@ -302,13 +304,14 @@ class CardViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             user = request.user
             user_card = get_object_or_404(UserCards, user=user, card__id=pk)
-            user_card.usage_counter = (
-                user_card.usage_counter + request.data['usage_counter']
-            )
-            user_card.save()
-            serializer = CardsListSerializer(user_card)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            new_statistics = request.data['usage_counter']
+            if user_card.usage_counter < new_statistics:
+                user_card.usage_counter = new_statistics
+                user_card.save()
+                serializer = CardsListSerializer(user_card)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            raise StatisticsError
+        return serializers.ValidationError(serializer.errors)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
