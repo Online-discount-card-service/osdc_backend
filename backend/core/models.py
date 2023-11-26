@@ -114,11 +114,6 @@ class Card(models.Model):
         default=EAN_13,
         blank=True
     )
-    usage_counter = models.PositiveBigIntegerField(
-        verbose_name='Количество использований карты',
-        default=0,
-        blank=True
-    )
     users = models.ManyToManyField(
         User,
         through='UserCards',
@@ -160,6 +155,11 @@ class UserCards(models.Model):
         verbose_name='Избранное',
         blank=True,
         default=False,
+    )
+    usage_counter = models.PositiveBigIntegerField(
+        verbose_name='Количество использований карты',
+        default=0,
+        blank=True
     )
 
     class Meta:
