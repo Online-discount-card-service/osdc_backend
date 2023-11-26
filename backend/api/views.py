@@ -215,7 +215,6 @@ class CardViewSet(viewsets.ModelViewSet):
                 favourite=False,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # raise serializers.ValidationError(serializer.errors)
 
     @swagger_auto_schema(
         responses={200: CardsListSerializer(many=True)},
@@ -311,7 +310,6 @@ class CardViewSet(viewsets.ModelViewSet):
                 serializer = CardsListSerializer(user_card)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             raise StatisticsError
-        # return serializers.ValidationError(serializer.errors)
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):
