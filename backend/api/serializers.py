@@ -1,6 +1,7 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
+from core.consts import MAX_NUM_CARD_USE_BY_USER
 from core.models import Card, Group, Shop, UserCards
 from users.models import User
 
@@ -114,6 +115,15 @@ class CardShopCreateSerializer(CardEditSerializer):
             shop.group.add(group)
         card = Card.objects.create(shop=shop, **validated_data)
         return card
+
+
+class StatisticsSerializer(serializers.Serializer):
+    """Сериализатор добавления статистики."""
+
+    usage_counter = serializers.IntegerField(
+        min_value=1,
+        max_value=MAX_NUM_CARD_USE_BY_USER
+    )
 
 
 class UserCustomCreateSerializer(UserCreateSerializer):
