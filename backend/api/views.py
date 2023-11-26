@@ -298,14 +298,14 @@ class CardViewSet(viewsets.ModelViewSet):
             Доступно только увеличение счётчика.
             '''
     )
-    @action(detail=True, methods=['patch'],)
+    @action(detail=True, methods=['patch'], name='statistics')
     def statistics(self, request, pk):
         serializer = StatisticsSerializer(data=request.data)
         if serializer.is_valid():
             user = request.user
             user_card = get_object_or_404(UserCards, user=user, card__id=pk)
             new_statistics = request.data['usage_counter']
-            if user_card.usage_counter < new_statistics:
+            if user_card.usage_counter < int(new_statistics):
                 user_card.usage_counter = new_statistics
                 user_card.save()
                 serializer = CardsListSerializer(user_card)
