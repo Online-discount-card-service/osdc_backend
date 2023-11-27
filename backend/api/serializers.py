@@ -95,7 +95,12 @@ class ShopCreateSerializer(serializers.Serializer):
     """Сериализатор создания магазина с возможностью добавить категорию."""
 
     name = serializers.CharField()
-    group = serializers.IntegerField(required=False,default=None)
+    group = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=False,
+        queryset=Group.objects.all(),
+        required=False
+    )
 
     class Meta:
         model = Shop
@@ -111,8 +116,8 @@ class CardShopCreateSerializer(CardEditSerializer):
         shop_name = validated_data.pop('shop')
         shop = Shop.objects.create(name=shop_name['name'])
         if shop_name['group']:
-            group = Group.objects.get(id=shop_name['group'])
-            shop.group.add(group)
+            groups = shop_name['group']
+            shop.group.set(groups)
         card = Card.objects.create(shop=shop, **validated_data)
         return card
 
