@@ -92,7 +92,7 @@ class CardsListSerializer(serializers.ModelSerializer):
 
 
 class ShopCreateSerializer(serializers.Serializer):
-    """Сериализатор создания магазина с возможностью добавить категорию."""
+    """Сериализатор создания магазина с возможностью добавить категории."""
 
     name = serializers.CharField()
     group = serializers.PrimaryKeyRelatedField(
