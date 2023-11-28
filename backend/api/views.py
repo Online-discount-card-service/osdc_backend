@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
 
+from .exceptions import StatisticsError
 from .permissions import IsCardsUser
 from .serializers import (
     CardEditSerializer,
@@ -19,6 +20,7 @@ from .serializers import (
     CardsListSerializer,
     GroupSerializer,
     ShopSerializer,
+    StatisticsSerializer,
 )
 
 
@@ -204,7 +206,7 @@ class CardViewSet(viewsets.ModelViewSet):
     def create_with_new_shop(self, request):
         user = self.request.user
         serializer = CardShopCreateSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             card = serializer.save()
             UserCards.objects.create(
                 user=user,
@@ -213,7 +215,6 @@ class CardViewSet(viewsets.ModelViewSet):
                 favourite=False,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        raise serializers.ValidationError(serializer.errors)
 
     @swagger_auto_schema(
         responses={200: CardsListSerializer(many=True)},
@@ -284,6 +285,31 @@ class CardViewSet(viewsets.ModelViewSet):
         raise serializers.ValidationError(
             {"errors": "Что-то пошло не так."}
         )
+
+    @swagger_auto_schema(
+        methods=['PATCH'],
+        request_body=StatisticsSerializer(),
+        responses={200: CardsListSerializer()},
+        operation_summary='Увеличение счётчика использования',
+        operation_description='''
+            Присваивает счётчику использования карты число,
+            переданное в теле запроса.
+            Доступно только увеличение счётчика.
+            '''
+    )
+    @action(detail=True, methods=['patch'], name='statistics')
+    def statistics(self, request, pk):
+        serializer = StatisticsSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = request.user
+            user_card = get_object_or_404(UserCards, user=user, card__id=pk)
+            new_statistics = request.data['usage_counter']
+            if user_card.usage_counter < int(new_statistics):
+                user_card.usage_counter = new_statistics
+                user_card.save()
+                serializer = CardsListSerializer(user_card)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            raise StatisticsError
 
 
 class ShopViewSet(viewsets.ReadOnlyModelViewSet):

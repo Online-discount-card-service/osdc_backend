@@ -1,6 +1,7 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
+from core.consts import MAX_NUM_CARD_USE_BY_USER
 from core.models import Card, Group, Shop, UserCards
 from users.models import User
 
@@ -42,7 +43,7 @@ class CardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Card
-        exclude = ('users', )
+        exclude = ('users',)
 
     def get_image(self, obj):
         """Возвращает относительный путь изображения."""
@@ -63,7 +64,7 @@ class CardEditSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Card
-        exclude = ('users', 'usage_counter')
+        exclude = ('users',)
 
     def validate(self, data):
         """Проверка наличия номера карты и/или штрих-кода."""
@@ -91,13 +92,19 @@ class CardsListSerializer(serializers.ModelSerializer):
 
 
 class ShopCreateSerializer(serializers.Serializer):
-    """Сериализатор создания магазина."""
+    """Сериализатор создания магазина с возможностью добавить категории."""
 
     name = serializers.CharField()
+    group = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=False,
+        queryset=Group.objects.all(),
+        required=False
+    )
 
     class Meta:
         model = Shop
-        fields = ('name',)
+        fields = ('name', 'group',)
 
 
 class CardShopCreateSerializer(CardEditSerializer):
@@ -108,8 +115,20 @@ class CardShopCreateSerializer(CardEditSerializer):
     def create(self, validated_data):
         shop_name = validated_data.pop('shop')
         shop = Shop.objects.create(name=shop_name['name'])
+        if 'group' in shop_name:
+            groups = shop_name['group']
+            shop.group.set(groups)
         card = Card.objects.create(shop=shop, **validated_data)
         return card
+
+
+class StatisticsSerializer(serializers.Serializer):
+    """Сериализатор добавления статистики."""
+
+    usage_counter = serializers.IntegerField(
+        min_value=1,
+        max_value=MAX_NUM_CARD_USE_BY_USER
+    )
 
 
 class UserCustomCreateSerializer(UserCreateSerializer):
