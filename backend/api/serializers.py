@@ -115,7 +115,7 @@ class CardShopCreateSerializer(CardEditSerializer):
     def create(self, validated_data):
         shop_name = validated_data.pop('shop')
         shop = Shop.objects.create(name=shop_name['name'])
-        if shop_name['group']:
+        if 'group' in shop_name:
             groups = shop_name['group']
             shop.group.set(groups)
         card = Card.objects.create(shop=shop, **validated_data)
