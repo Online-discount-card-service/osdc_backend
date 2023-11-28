@@ -103,3 +103,78 @@ class APITests(APITestCase):
     def tearDownClass(cls):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+
+class APIShopEditTests(APITestCase):
+    """Родительский класс с тестовыми данными и константами."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.GROUPS = 3
+
+        for group_num in range(cls.GROUPS):
+            Group.objects.create(name=f'Test Group #{group_num}')
+        cls.group = Group.objects.order_by().first()
+
+        cls.shop_unvalidated = Shop.objects.create(
+            name='Test Unvalidated Shop',
+            validation=False,
+        )
+        cls.shop_unvalidated_from_friends_card = Shop.objects.create(
+            name='Test Unvalidated Shop from friends card',
+            validation=False,
+        )
+        cls.shop_validated = Shop.objects.create(
+            name='Validated Shop',
+            validation=True
+        )
+
+        cls.card_unvalidated = Card.objects.create(
+            name='Test Card With Unvalidated Shop',
+            shop=cls.shop_unvalidated,
+            card_number='12345678',
+        )
+        cls.card_unvalidated_from_friend = Card.objects.create(
+            name='Test Card Shared By Friend',
+            shop=cls.shop_unvalidated_from_friends_card
+        )
+        cls.card_validated = Card.objects.create(
+            name='Test Card With Validated Shop',
+            shop=cls.shop_validated
+        )
+        cls.user = User.objects.create_user(
+            email='user@example.com',
+            password='TestPass9',
+            phone_number='+79999999999',
+        )
+
+        UserCards.objects.create(
+            user=cls.user,
+            card=cls.card_unvalidated,
+            owner=True,
+            favourite=False,
+        )
+        UserCards.objects.create(
+            user=cls.user,
+            card=cls.card_unvalidated_from_friend,
+            owner=False,
+            favourite=False,
+        )
+        UserCards.objects.create(
+            user=cls.user,
+            card=cls.card_validated,
+            owner=True,
+            favourite=False,
+        )
+
+    def setUp(self):
+        self.guest_client = APIClient()
+        self.auth_client = APIClient()
+        self.auth_client.force_authenticate(user=self.user)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)

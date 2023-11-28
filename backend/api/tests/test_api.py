@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from core.models import Card, UserCards
 
-from .fixtures import APITests
+from .fixtures import APIShopEditTests, APITests
 
 
 User = get_user_model()
@@ -274,7 +274,7 @@ class EndpointsTestCase(APITests):
         )
 
     def test_card_statistics(self):
-        """Проверка увеличения счетика использования карты."""
+        """Проверка увеличения счетчика использования карты."""
 
         response = self.auth_client.patch(
             reverse(
@@ -334,3 +334,55 @@ class EndpointsTestCase(APITests):
 
         response = self.guest_client.get(reverse('api:group-list'))
         self.assertEqual(len(response.data), self.GROUPS)
+
+
+class ShopEditTestCase(APIShopEditTests):
+    """Проверка редактирования неверифицированного магазина."""
+
+    def test_unvalidated_shop_edit(self):
+        """Пользователь, создавший магазин, может его редактировать."""
+        response = self.auth_client.patch(
+            reverse(
+                'api:shop-edit',
+                kwargs={'pk': f'{self.shop_unvalidated.id}'},
+            ),
+            {
+                'name': 'New shop name',
+                'group': f'{self.group.id}'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.shop_unvalidated.refresh_from_db()
+        self.assertEqual(self.shop_unvalidated.name, 'New shop name')
+        group = self.shop_unvalidated.group.all()[0]
+        self.assertEqual(group, self.group)
+
+    def test_unvalidated_friends_shop_not_edit(self):
+        """Пользователь не может редактировать магазин расшаренной карты."""
+
+        response = self.auth_client.patch(
+            reverse(
+                'api:shop-edit',
+                kwargs={'pk': f'{self.shop_unvalidated_from_friends_card.id}'},
+            ),
+            {
+                'name': 'New shop name',
+                'group': f'{self.group.id}'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_validated_shop_not_edit(self):
+        """Пользователь не может редактировать предустановленный магазин."""
+
+        response = self.auth_client.patch(
+            reverse(
+                'api:shop-edit',
+                kwargs={'pk': f'{self.shop_validated.id}'},
+            ),
+            {
+                'name': 'New shop name',
+                'group': f'{self.group.id}'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

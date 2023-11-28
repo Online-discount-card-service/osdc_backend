@@ -7,6 +7,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     CardViewSet,
     GroupViewSet,
+    ShopEditViewSet,
     ShopViewSet,
     TokenDestroyView,
     UserViewSet,
@@ -36,6 +37,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    path('v1/shops/<int:pk>/', ShopEditViewSet.as_view(), name="shop-edit"),
     path('v1/', include(router.urls)),
     path('v1/auth/token/logout/', TokenDestroyView.as_view(), name="logout"),
     path('v1/auth/', include('djoser.urls.authtoken')),

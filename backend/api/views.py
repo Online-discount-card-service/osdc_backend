@@ -6,19 +6,21 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
 
 from .exceptions import StatisticsError
-from .permissions import IsCardsUser
+from .permissions import IsCardsUser, IsShopCreatorOrReadOnly
 from .serializers import (
     CardEditSerializer,
     CardSerializer,
     CardShopCreateSerializer,
     CardsListSerializer,
     GroupSerializer,
+    ShopCreateSerializer,
     ShopSerializer,
     StatisticsSerializer,
 )
@@ -338,6 +340,27 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+
+
+class ShopEditViewSet(UpdateAPIView):
+    http_method_names = ['patch']
+    queryset = Shop.objects.all()
+    serializer_class = ShopCreateSerializer
+    permission_classes = (IsShopCreatorOrReadOnly,)
+
+    @swagger_auto_schema(
+        methods=['PATCH'],
+        request_body=ShopCreateSerializer(),
+        responses={200: ShopSerializer()},
+        operation_summary='Изменение магазина и его категории',
+        operation_description='''
+            Частично редактирует магазин,
+            если он был создан текущим пользователем.
+            '''
+    )
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
