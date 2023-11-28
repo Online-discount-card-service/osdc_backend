@@ -43,7 +43,7 @@ class CardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Card
-        exclude = ('users', )
+        exclude = ('users',)
 
     def get_image(self, obj):
         """Возвращает относительный путь изображения."""
@@ -92,13 +92,19 @@ class CardsListSerializer(serializers.ModelSerializer):
 
 
 class ShopCreateSerializer(serializers.Serializer):
-    """Сериализатор создания магазина."""
+    """Сериализатор создания магазина с возможностью добавить категории."""
 
     name = serializers.CharField()
+    group = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=False,
+        queryset=Group.objects.all(),
+        required=False
+    )
 
     class Meta:
         model = Shop
-        fields = ('name',)
+        fields = ('name', 'group',)
 
 
 class CardShopCreateSerializer(CardEditSerializer):
@@ -109,6 +115,9 @@ class CardShopCreateSerializer(CardEditSerializer):
     def create(self, validated_data):
         shop_name = validated_data.pop('shop')
         shop = Shop.objects.create(name=shop_name['name'])
+        if shop_name['group']:
+            groups = shop_name['group']
+            shop.group.set(groups)
         card = Card.objects.create(shop=shop, **validated_data)
         return card
 
