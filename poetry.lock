@@ -280,6 +280,22 @@ asgiref = ">=3.6"
 Django = ">=3.2"
 
 [[package]]
+name = "django-sendgrid-v5"
+version = "1.2.3"
+description = "An implementation of Django's EmailBackend compatible with sendgrid-python v5+"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-sendgrid-v5-1.2.3.tar.gz", hash = "sha256:3887aafbb10d5b808efc2c1031dcd96fd357d542eb5affe38fef07cc0f3cfae9"},
+    {file = "django_sendgrid_v5-1.2.3-py2.py3-none-any.whl", hash = "sha256:2d2fa8a085d21c95e5f97fc60b61f199ccc57a27df8da90cd3f29a5702346dc6"},
+]
+
+[package.dependencies]
+django = ">=1.8"
+python-http-client = ">=3.0.0"
+sendgrid = ">=5.0.0"
+
+[[package]]
 name = "django-templated-mail"
 version = "1.1.1"
 description = "Send emails using Django template system."
@@ -631,6 +647,17 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-http-client"
+version = "3.3.7"
+description = "HTTP REST client, simplified for Python"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "python_http_client-3.3.7-py3-none-any.whl", hash = "sha256:ad371d2bbedc6ea15c26179c6222a78bc9308d272435ddf1d5c84f068f249a36"},
+    {file = "python_http_client-3.3.7.tar.gz", hash = "sha256:bf841ee45262747e00dec7ee9971dfb8c7d83083f5713596488d67739170cea0"},
+]
+
+[[package]]
 name = "python3-openid"
 version = "3.2.0"
 description = "OpenID support for modern servers and consumers."
@@ -758,6 +785,21 @@ requests = ">=2.0.0"
 rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
+name = "sendgrid"
+version = "6.10.0"
+description = "Twilio SendGrid library for Python"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "sendgrid-6.10.0-py3-none-any.whl", hash = "sha256:522b30fc98306496208c5d8bdd5642cd6a2fd65cad487475f57f9098ce880604"},
+    {file = "sendgrid-6.10.0.tar.gz", hash = "sha256:9b15050c6f8826ee576f76a786efb15d956639f485478cbddd79ed69e8350ab8"},
+]
+
+[package.dependencies]
+python-http-client = ">=3.2.1"
+starkbank-ecdsa = ">=2.0.1"
+
+[[package]]
 name = "social-auth-app-django"
 version = "5.4.0"
 description = "Python Social Authentication, Django integration."
@@ -815,6 +857,16 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "starkbank-ecdsa"
+version = "2.2.0"
+description = "A lightweight and fast pure python ECDSA library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "starkbank-ecdsa-2.2.0.tar.gz", hash = "sha256:9399c3371b899d4a235b68a1ed7919d202fbf024bd2c863ae8ebdad343c2a63a"},
+]
+
+[[package]]
 name = "tzdata"
 version = "2023.3"
 description = "Provider of IANA time zone data"
@@ -856,4 +908,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "57af25f4589f2a68e4ac8239e9097b0e456778dcfe6bb20c59087e24a8e5b34a"
+content-hash = "3616d2378e5253dbac6088d9f84f9cacf95140c21616fcbbfc4da956a5e87f66"
