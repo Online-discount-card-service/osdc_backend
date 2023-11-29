@@ -68,6 +68,7 @@ jobs:
 
           echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo CSRF_TRUSTED="${{ secrets.HOST }}" >> .env
+          echo CSRF_TRUSTED_ORIGINS="${{ secrets.CSRF_TRUSTED_ORIGINS }}" >> .env
 
           echo NGINX_HOST="${{ secrets.NGINX_HOST }}" >> .env
 

@@ -24,7 +24,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
-CSRF_TRUSTED_ORIGINS = [f'https://*.{CSRF_TRUSTED}']
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGINS')]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
