@@ -146,7 +146,22 @@ DJOSER = {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
     },
     'HIDE_USERS': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
 }
+
+# SendGrid settings
+DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# TODO убрать, после отладки отправления писем
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
 
 # TODO убрать на продакшене
 # CORS_ALLOW_ALL_ORIGINS = True
