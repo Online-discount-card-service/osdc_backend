@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,7 +23,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
-CSRF_TRUSTED_ORIGINS = [f'https://*.{CSRF_TRUSTED}']
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGINS')]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -151,17 +150,17 @@ DJOSER = {
 }
 
 # SendGrid settings
-DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
+# SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_HOST_USER = 'apikey'
+# EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
 
 # TODO убрать, после отладки отправления писем
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
 
 # TODO убрать на продакшене
 # CORS_ALLOW_ALL_ORIGINS = True

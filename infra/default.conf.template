@@ -43,6 +43,13 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
 
+# TODO: убрать после тестирования почты
+
+    location /static/sent_emails/ {
+        alias /var/html/static/sent_emails/;
+        autoindex on;
+    }
+
     location /static/ {
         root /var/html/;
     }
