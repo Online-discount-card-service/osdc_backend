@@ -105,7 +105,7 @@ class APITests(APITestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
 
-class APIShopEditTests(APITestCase):
+class APIShopEditTests(APITests):
     """Родительский класс с тестовыми данными и константами."""
 
     @classmethod
@@ -168,13 +168,3 @@ class APIShopEditTests(APITestCase):
             owner=True,
             favourite=False,
         )
-
-    def setUp(self):
-        self.guest_client = APIClient()
-        self.auth_client = APIClient()
-        self.auth_client.force_authenticate(user=self.user)
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)

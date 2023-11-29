@@ -343,7 +343,7 @@ class ShopEditTestCase(APIShopEditTests):
         """Пользователь, создавший магазин, может его редактировать."""
         response = self.auth_client.patch(
             reverse(
-                'api:shop-edit',
+                'api:shop-detail',
                 kwargs={'pk': f'{self.shop_unvalidated.id}'},
             ),
             {
@@ -362,7 +362,7 @@ class ShopEditTestCase(APIShopEditTests):
 
         response = self.auth_client.patch(
             reverse(
-                'api:shop-edit',
+                'api:shop-detail',
                 kwargs={'pk': f'{self.shop_unvalidated_from_friends_card.id}'},
             ),
             {
@@ -377,7 +377,7 @@ class ShopEditTestCase(APIShopEditTests):
 
         response = self.auth_client.patch(
             reverse(
-                'api:shop-edit',
+                'api:shop-detail',
                 kwargs={'pk': f'{self.shop_validated.id}'},
             ),
             {

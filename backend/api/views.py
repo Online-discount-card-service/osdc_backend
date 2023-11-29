@@ -6,7 +6,6 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -314,12 +313,28 @@ class CardViewSet(viewsets.ModelViewSet):
             raise StatisticsError
 
 
-class ShopViewSet(viewsets.ReadOnlyModelViewSet):
+class ShopViewSet(viewsets.ModelViewSet):
     """Вьюсет для отображения единично и списком Магазинов."""
 
-    queryset = Shop.objects.filter(validation=True)
+    http_method_names = ['patch', 'get', 'head']
     serializer_class = ShopSerializer
     permission_classes = (AllowAny,)
+    queryset = Shop.objects.filter(validation=True)
+
+    def get_queryset(self):
+        if self.action == 'partial_update':
+            return Shop.objects.all()
+        return Shop.objects.filter(validation=True)
+
+    def get_serializer_class(self):
+        if self.action == 'partial_update':
+            return ShopCreateSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action == 'partial_update':
+            return (IsShopCreatorOrReadOnly(),)
+        return super().get_permissions()
 
     @swagger_auto_schema(
         responses={200: ShopSerializer()},
@@ -341,15 +356,7 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-
-class ShopEditViewSet(UpdateAPIView):
-    http_method_names = ['patch']
-    queryset = Shop.objects.all()
-    serializer_class = ShopCreateSerializer
-    permission_classes = (IsShopCreatorOrReadOnly,)
-
     @swagger_auto_schema(
-        methods=['PATCH'],
         request_body=ShopCreateSerializer(),
         responses={200: ShopSerializer()},
         operation_summary='Изменение магазина и его категории',
