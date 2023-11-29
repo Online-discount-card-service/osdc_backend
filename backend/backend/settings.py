@@ -73,7 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -139,8 +138,8 @@ DJOSER = {
         'user_create': 'api.serializers.UserCustomCreateSerializer',
         'user': 'api.serializers.UserReadSerializer',
         'current_user': 'api.serializers.UserReadSerializer',
+        'token_create': 'api.serializers.TokenCreateSerializer',
     },
-
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
     },
