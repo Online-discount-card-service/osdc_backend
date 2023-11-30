@@ -48,7 +48,7 @@ class TokenDestroyView(TokenDestroyView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response(
-            {"Message": "Вы успешно вышли из учетной записи."},
+            {'message': 'Вы успешно вышли из учетной записи.'},
             status=status.HTTP_200_OK
         )
 
@@ -181,7 +181,7 @@ class CardViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         return Response(
-            {"Message": "Карта успешно удалена."},
+            {'message': 'Карта успешно удалена.'},
             status=status.HTTP_200_OK
         )
 

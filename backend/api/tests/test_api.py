@@ -243,7 +243,7 @@ class EndpointsTestCase(APITests):
 
         response = self.auth_client.delete(self.CARD_DETAIL_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"Message": "Карта успешно удалена."})
+        self.assertEqual(response.data, {"message": "Карта успешно удалена."})
         self.assertFalse(
             UserCards.objects.filter(
                 user=self.user, card__pk=self.card.pk).exists(),
@@ -262,7 +262,7 @@ class EndpointsTestCase(APITests):
             kwargs={'pk': self.card_user_not_own.pk}
         ))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"Message": "Карта успешно удалена."})
+        self.assertEqual(response.data, {"message": "Карта успешно удалена."})
         self.assertFalse(
             UserCards.objects.filter(
                 user=self.user, card__pk=self.card_user_not_own.pk).exists(),
