@@ -12,13 +12,14 @@ from rest_framework.response import Response
 from core.models import Card, Group, Shop, UserCards
 
 from .exceptions import StatisticsError
-from .permissions import IsCardsUser
+from .permissions import IsCardsUser, IsShopCreatorOrReadOnly
 from .serializers import (
     CardEditSerializer,
     CardSerializer,
     CardShopCreateSerializer,
     CardsListSerializer,
     GroupSerializer,
+    ShopCreateSerializer,
     ShopSerializer,
     StatisticsSerializer,
 )
@@ -312,12 +313,28 @@ class CardViewSet(viewsets.ModelViewSet):
             raise StatisticsError
 
 
-class ShopViewSet(viewsets.ReadOnlyModelViewSet):
+class ShopViewSet(viewsets.ModelViewSet):
     """Вьюсет для отображения единично и списком Магазинов."""
 
-    queryset = Shop.objects.filter(validation=True)
+    http_method_names = ['patch', 'get', 'head']
     serializer_class = ShopSerializer
     permission_classes = (AllowAny,)
+    queryset = Shop.objects.filter(validation=True)
+
+    def get_queryset(self):
+        if self.action == 'partial_update':
+            return Shop.objects.all()
+        return Shop.objects.filter(validation=True)
+
+    def get_serializer_class(self):
+        if self.action == 'partial_update':
+            return ShopCreateSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action == 'partial_update':
+            return (IsShopCreatorOrReadOnly(),)
+        return super().get_permissions()
 
     @swagger_auto_schema(
         responses={200: ShopSerializer()},
@@ -338,6 +355,19 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=ShopCreateSerializer(),
+        responses={200: ShopSerializer()},
+        operation_summary='Изменение магазина и его категории',
+        operation_description='''
+            Частично редактирует магазин,
+            если он был создан текущим пользователем.
+            '''
+    )
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):

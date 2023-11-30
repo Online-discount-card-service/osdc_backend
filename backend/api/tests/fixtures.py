@@ -103,3 +103,61 @@ class APITests(APITestCase):
     def tearDownClass(cls):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+
+class APIShopEditTests(APITests):
+    """Родительский класс с тестовыми данными и константами."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        for group_num in range(cls.GROUPS):
+            Group.objects.create(name=f'Test Group #{group_num}')
+        cls.group = Group.objects.order_by().first()
+
+        cls.shop_unvalidated = Shop.objects.create(
+            name='Test Unvalidated Shop',
+            validation=False,
+        )
+        cls.shop_unvalidated_from_friends_card = Shop.objects.create(
+            name='Test Unvalidated Shop from friends card',
+            validation=False,
+        )
+        cls.shop_validated = Shop.objects.create(
+            name='Validated Shop',
+            validation=True
+        )
+
+        cls.card_unvalidated_shop = Card.objects.create(
+            name='Test Card With Unvalidated Shop',
+            shop=cls.shop_unvalidated,
+            card_number='12345678',
+        )
+        cls.card_unvalidated_from_friend = Card.objects.create(
+            name='Test Card Shared By Friend',
+            shop=cls.shop_unvalidated_from_friends_card
+        )
+        cls.card_validated_shop = Card.objects.create(
+            name='Test Card With Validated Shop',
+            shop=cls.shop_validated
+        )
+
+        UserCards.objects.create(
+            user=cls.user,
+            card=cls.card_unvalidated_shop,
+            owner=True,
+            favourite=False,
+        )
+        UserCards.objects.create(
+            user=cls.user,
+            card=cls.card_unvalidated_from_friend,
+            owner=False,
+            favourite=False,
+        )
+        UserCards.objects.create(
+            user=cls.user,
+            card=cls.card_validated_shop,
+            owner=True,
+            favourite=False,
+        )

@@ -91,7 +91,7 @@ class CardsListSerializer(serializers.ModelSerializer):
         exclude = ('id', 'user', )
 
 
-class ShopCreateSerializer(serializers.Serializer):
+class ShopCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания магазина с возможностью добавить категории."""
 
     name = serializers.CharField()
@@ -105,6 +105,9 @@ class ShopCreateSerializer(serializers.Serializer):
     class Meta:
         model = Shop
         fields = ('name', 'group',)
+
+    def to_representation(self, instance):
+        return ShopSerializer(instance).data
 
 
 class CardShopCreateSerializer(CardEditSerializer):
