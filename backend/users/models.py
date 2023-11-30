@@ -69,6 +69,11 @@ class User(AbstractUser):
         unique=True
     )
 
+    is_active = models.BooleanField(
+        verbose_name=('Почта подтверждена'),
+        default=False
+    )
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name', 'phone_number']
 

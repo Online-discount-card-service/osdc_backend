@@ -1,4 +1,10 @@
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from django.contrib.auth import authenticate
+from djoser.conf import settings
+from djoser.serializers import (
+    TokenCreateSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+)
 from rest_framework import serializers
 
 from core.consts import MAX_NUM_CARD_USE_BY_USER
@@ -159,3 +165,21 @@ class UserReadSerializer(UserSerializer):
             'name',
             'phone_number',
         )
+
+
+class TokenCreateSerializer(TokenCreateSerializer):
+    """Выдает токен. Не проверяет активирован ли пользователь."""
+
+    def validate(self, attrs):
+        password = attrs.get('password')
+        params = {settings.LOGIN_FIELD: attrs.get(settings.LOGIN_FIELD)}
+        self.user = authenticate(
+            request=self.context.get("request"), **params, password=password
+        )
+        if not self.user:
+            self.user = User.objects.filter(**params).first()
+            if self.user and not self.user.check_password(password):
+                self.fail("invalid_credentials")
+        if self.user:
+            return attrs
+        self.fail("invalid_credentials")

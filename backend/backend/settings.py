@@ -73,7 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -128,7 +127,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'users.authentication.CustomTokenAuthentication',
     ],
     'EXCEPTION_HANDLER': 'api.exception_handler.custom_exception_handler',
 }
@@ -139,8 +138,8 @@ DJOSER = {
         'user_create': 'api.serializers.UserCustomCreateSerializer',
         'user': 'api.serializers.UserReadSerializer',
         'current_user': 'api.serializers.UserReadSerializer',
+        'token_create': 'api.serializers.TokenCreateSerializer',
     },
-
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
     },
