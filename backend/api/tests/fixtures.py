@@ -112,8 +112,6 @@ class APIShopEditTests(APITests):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.GROUPS = 3
-
         for group_num in range(cls.GROUPS):
             Group.objects.create(name=f'Test Group #{group_num}')
         cls.group = Group.objects.order_by().first()
@@ -131,7 +129,7 @@ class APIShopEditTests(APITests):
             validation=True
         )
 
-        cls.card_unvalidated = Card.objects.create(
+        cls.card_unvalidated_shop = Card.objects.create(
             name='Test Card With Unvalidated Shop',
             shop=cls.shop_unvalidated,
             card_number='12345678',
@@ -140,19 +138,14 @@ class APIShopEditTests(APITests):
             name='Test Card Shared By Friend',
             shop=cls.shop_unvalidated_from_friends_card
         )
-        cls.card_validated = Card.objects.create(
+        cls.card_validated_shop = Card.objects.create(
             name='Test Card With Validated Shop',
             shop=cls.shop_validated
-        )
-        cls.user = User.objects.create_user(
-            email='user@example.com',
-            password='TestPass9',
-            phone_number='+79999999999',
         )
 
         UserCards.objects.create(
             user=cls.user,
-            card=cls.card_unvalidated,
+            card=cls.card_unvalidated_shop,
             owner=True,
             favourite=False,
         )
@@ -164,7 +157,7 @@ class APIShopEditTests(APITests):
         )
         UserCards.objects.create(
             user=cls.user,
-            card=cls.card_validated,
+            card=cls.card_validated_shop,
             owner=True,
             favourite=False,
         )

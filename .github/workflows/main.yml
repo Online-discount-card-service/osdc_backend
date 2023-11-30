@@ -8,6 +8,8 @@ on:
 
 jobs:
   tests:
+    env:
+      CSRF_TRUSTED_ORIGINS: ${{ secrets.CSRF_TRUSTED_ORIGINS }}
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
@@ -68,8 +70,12 @@ jobs:
 
           echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo CSRF_TRUSTED="${{ secrets.HOST }}" >> .env
+          echo CSRF_TRUSTED_ORIGINS="${{ secrets.CSRF_TRUSTED_ORIGINS }}" >> .env
 
           echo NGINX_HOST="${{ secrets.NGINX_HOST }}" >> .env
+
+          echo SENDGRID_FROM_EMAIL="${{ secrets.SENDGRID_FROM_EMAIL }}" >> .env
+          echo SENDGRID_API_KEY="${{ secrets.SENDGRID_API_KEY }}" >> .env
 
           echo DB_ENGINE="django.db.backends.postgresql" >> .env
           echo DB_NAME="${{ secrets.POSTGRES_USER }}" >> .env

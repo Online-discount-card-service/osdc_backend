@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,7 +23,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
-CSRF_TRUSTED_ORIGINS = [f'https://*.{CSRF_TRUSTED}']
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000')]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -146,7 +145,19 @@ DJOSER = {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
     },
     'HIDE_USERS': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
 }
+
+# SendGrid settings
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# TODO убрать, после отладки отправления писем
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
 
 # TODO убрать на продакшене
 # CORS_ALLOW_ALL_ORIGINS = True
