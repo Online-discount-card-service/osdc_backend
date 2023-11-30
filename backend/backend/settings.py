@@ -127,7 +127,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'users.authentication.CustomTokenAuthentication',
     ],
     'EXCEPTION_HANDLER': 'api.exception_handler.custom_exception_handler',
 }
