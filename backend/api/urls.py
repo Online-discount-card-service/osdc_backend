@@ -6,10 +6,10 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     CardViewSet,
+    CustomTokenDestroyView,
+    CustomUserViewSet,
     GroupViewSet,
     ShopViewSet,
-    TokenDestroyView,
-    UserViewSet,
 )
 
 
@@ -17,7 +17,7 @@ app_name = 'api'
 
 router = DefaultRouter()
 
-router.register('users', UserViewSet)
+router.register('users', CustomUserViewSet)
 router.register('cards', CardViewSet)
 router.register('shops', ShopViewSet)
 router.register('groups', GroupViewSet)
@@ -36,9 +36,19 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
-    path('v1/auth/token/logout/', TokenDestroyView.as_view(), name="logout"),
-    path('v1/auth/', include('djoser.urls.authtoken')),
+    path(
+        'v1/',
+        include(router.urls)
+    ),
+    path(
+        'v1/auth/token/logout/',
+        CustomTokenDestroyView.as_view(),
+        name='logout'
+    ),
+    path(
+        'v1/auth/',
+        include('djoser.urls.authtoken'),
+    ),
     path(
         'docs/swagger/',
         schema_view.with_ui('swagger', cache_timeout=0),
