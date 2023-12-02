@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from rest_framework import permissions, serializers
 
 from core.models import Card, UserCards
 
@@ -32,3 +34,28 @@ class IsShopCreatorOrReadOnly(permissions.IsAuthenticated):
                 and not obj.validation
             )
         return request.method in permissions.SAFE_METHODS
+
+
+class IsUserEmailOwner(permissions.IsAuthenticated):
+    """Разрешения: подтвердить можно только свою почту."""
+
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+
+        uid = request.data.get('uid')
+        if uid is None:
+            raise serializers.ValidationError(
+                {'uid': 'Обязательное поле.'})
+
+        try:
+            id_from_email = int(
+                force_str(
+                    urlsafe_base64_decode(uid)
+                )
+            )
+        except (KeyError, TypeError, ValueError):
+            raise serializers.ValidationError(
+                {'uid': 'Неверный формат uid.'})
+
+        return request.user.id == id_from_email

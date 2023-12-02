@@ -142,7 +142,7 @@ class StatisticsSerializer(serializers.Serializer):
     )
 
 
-class UserCustomCreateSerializer(UserCreateSerializer):
+class CustomUserCreateSerializer(UserCreateSerializer):
     """Сериализатор регистрации пользователей."""
 
     class Meta:
@@ -169,7 +169,7 @@ class UserReadSerializer(UserSerializer):
         )
 
 
-class TokenCreateSerializer(TokenCreateSerializer):
+class CustomTokenCreateSerializer(TokenCreateSerializer):
     """Выдает токен. Не проверяет активирован ли пользователь."""
 
     def validate(self, attrs):
