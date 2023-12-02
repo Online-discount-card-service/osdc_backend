@@ -58,7 +58,7 @@ class UserViewSet(UserViewSet):
     def pre_check_users(self, request,):
         serializer = UserPreCheckSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TokenDestroyView(TokenDestroyView):
