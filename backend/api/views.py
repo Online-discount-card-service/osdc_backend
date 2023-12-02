@@ -47,7 +47,7 @@ class CustomUserViewSet(UserViewSet):
     @swagger_auto_schema(
         methods=['POST'],
         request_body=UserPreCheckSerializer(),
-        responses={200: UserPreCheckSerializer()},
+        responses={204: None},
         operation_summary='Предварительная проверка почты и пароля',
     )
     @action(
