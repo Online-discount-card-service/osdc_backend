@@ -219,6 +219,9 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
             except ValidationError as error:
                 errors.append(error)
         if errors:
+            errors = ' '.join(map(str, errors))
+            errors = errors.replace("['","")
+            errors = errors.replace("']","")
             raise ValidationError(errors)
         return data
 
