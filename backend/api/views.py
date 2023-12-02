@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
+from users.tokens import custom_token_generator
 
 from .exceptions import StatisticsError
 from .permissions import IsCardsUser, IsShopCreatorOrReadOnly
@@ -28,9 +29,10 @@ from .serializers import (
 User = get_user_model()
 
 
-class UserViewSet(UserViewSet):
+class CustomUserViewSet(UserViewSet):
     """Эндпоинт для просмотра и управления пользователями."""
 
+    token_generator = custom_token_generator
     permission_classes = (CurrentUserOrAdmin,)
 
     @action(["get", "patch"], detail=False)
@@ -42,7 +44,7 @@ class UserViewSet(UserViewSet):
             return self.partial_update(request, *args, **kwargs)
 
 
-class TokenDestroyView(TokenDestroyView):
+class CustomTokenDestroyView(TokenDestroyView):
     """Эндпоинт для выхода из учетной записи."""
 
     def post(self, request):
