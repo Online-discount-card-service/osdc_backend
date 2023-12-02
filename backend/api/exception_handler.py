@@ -26,7 +26,7 @@ def handle_api_exception(exc, response):
             response_data = {'detail': {}}
 
         for field, value in errors.items():
-            current_key = f'{parent_key}.{field}' if parent_key else field
+            current_key = f'{parent_key}_{field}' if parent_key else field
             if isinstance(value, dict):
                 process_errors(value, current_key, response_data)
             else:
