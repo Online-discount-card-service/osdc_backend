@@ -1,4 +1,11 @@
+from difflib import SequenceMatcher
+
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import (
+    CommonPasswordValidator,
+    NumericPasswordValidator,
+)
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from djoser.conf import settings
 from djoser.serializers import (
@@ -11,7 +18,13 @@ from rest_framework import serializers
 
 from core.consts import MAX_NUM_CARD_USE_BY_USER
 from core.models import Card, Group, Shop, UserCards
+from users.consts import MAX_SIMILARITY, MIN_PASSWORD_LENGTH
 from users.models import User
+from users.passwordvalidators import (
+    LowercaseValidator,
+    NumberValidator,
+    UppercaseValidator,
+)
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -167,6 +180,49 @@ class UserReadSerializer(UserSerializer):
             'name',
             'phone_number',
         )
+
+
+class UserPreCheckSerializer(serializers.ModelSerializer):
+    """Сериализатор для проверки почты и пароля."""
+
+    password = serializers.CharField(
+        min_length=MIN_PASSWORD_LENGTH,
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ('email', 'password')
+
+    def validate(self, data):
+        password = data.get('password')
+        email = data.get('email')
+        sequence_matcher = SequenceMatcher(a=password.lower(), b=email.lower())
+        if sequence_matcher.quick_ratio() > MAX_SIMILARITY:
+            raise serializers.ValidationError("Пароль слишком похож на е-мейл")
+        return super(UserPreCheckSerializer, self).validate(data)
+
+    def validate_password(self, data):
+        errors = []
+        password_validators = (
+            NumericPasswordValidator,
+            NumberValidator,
+            UppercaseValidator,
+            LowercaseValidator
+        )
+        try:
+            validator = CommonPasswordValidator()
+            validator.validate(password=data, user=None)
+        except ValidationError as error:
+            errors.append(error)
+        for validator in password_validators:
+            try:
+                validator.validate(self, password=data, user=None)
+            except ValidationError as error:
+                errors.append(error)
+        if errors:
+            raise ValidationError(errors)
+        return data
 
 
 class CustomTokenCreateSerializer(TokenCreateSerializer):

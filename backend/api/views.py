@@ -23,6 +23,7 @@ from .serializers import (
     ShopCreateSerializer,
     ShopSerializer,
     StatisticsSerializer,
+    UserPreCheckSerializer,
 )
 
 
@@ -42,6 +43,24 @@ class CustomUserViewSet(UserViewSet):
             return self.retrieve(request, *args, **kwargs)
         elif request.method == "PATCH":
             return self.partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        methods=['POST'],
+        request_body=UserPreCheckSerializer(),
+        responses={200: UserPreCheckSerializer()},
+        operation_summary='Предварительная проверка почты и пароля',
+    )
+    @action(
+        detail=False,
+        methods=['POST'],
+        url_path='pre-check',
+        name='pre-check',
+        permission_classes=(AllowAny,)
+    )
+    def pre_check_users(self, request,):
+        serializer = UserPreCheckSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CustomTokenDestroyView(TokenDestroyView):
