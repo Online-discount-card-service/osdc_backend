@@ -138,7 +138,7 @@ DJOSER = {
         'user_create': 'api.serializers.CustomUserCreateSerializer',
         'user': 'api.serializers.UserReadSerializer',
         'current_user': 'api.serializers.UserReadSerializer',
-        'token_create': 'api.serializers.TokenCreateSerializer',
+        'token_create': 'api.serializers.CustomTokenCreateSerializer',
         'password_reset': 'api.serializers.CustomSendEmailResetSerializer',
     },
     'PERMISSIONS': {
