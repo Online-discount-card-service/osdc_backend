@@ -6,8 +6,10 @@ from django.contrib.auth.password_validation import (
     NumericPasswordValidator,
 )
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from djoser.conf import settings
 from djoser.serializers import (
+    SendEmailResetSerializer,
     TokenCreateSerializer,
     UserCreateSerializer,
     UserSerializer,
@@ -153,7 +155,7 @@ class StatisticsSerializer(serializers.Serializer):
     )
 
 
-class UserCustomCreateSerializer(UserCreateSerializer):
+class CustomUserCreateSerializer(UserCreateSerializer):
     """Сериализатор регистрации пользователей."""
 
     class Meta:
@@ -223,7 +225,7 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
         return data
 
 
-class TokenCreateSerializer(TokenCreateSerializer):
+class CustomTokenCreateSerializer(TokenCreateSerializer):
     """Выдает токен. Не проверяет активирован ли пользователь."""
 
     def validate(self, attrs):
@@ -239,3 +241,23 @@ class TokenCreateSerializer(TokenCreateSerializer):
         if self.user:
             return attrs
         self.fail("invalid_credentials")
+
+
+class CustomSendEmailResetSerializer(SendEmailResetSerializer):
+    phone_last_digits = serializers.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^\d{4}$',
+                message='Здесь должны быть последние 4 цифры телефона.',
+            )
+        ]
+    )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not User.objects.filter(
+                phone_number__endswith=attrs['phone_last_digits'],
+                email=attrs['email']
+        ).exists():
+            raise serializers.ValidationError('Неверные данные пользователя.')
+        return attrs

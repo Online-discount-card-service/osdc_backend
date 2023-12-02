@@ -135,17 +135,20 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'api.serializers.UserCustomCreateSerializer',
+        'user_create': 'api.serializers.CustomUserCreateSerializer',
         'user': 'api.serializers.UserReadSerializer',
         'current_user': 'api.serializers.UserReadSerializer',
-        'token_create': 'api.serializers.TokenCreateSerializer',
+        'token_create': 'api.serializers.CustomTokenCreateSerializer',
+        'password_reset': 'api.serializers.CustomSendEmailResetSerializer',
     },
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
+        'activation': ['api.permissions.IsUserEmailOwner'],
     },
     'HIDE_USERS': True,
     'SEND_ACTIVATION_EMAIL': True,
     'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'password_reset_confirm/{uid}/{token}',
 }
 
 # SendGrid settings
