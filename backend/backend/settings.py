@@ -139,6 +139,7 @@ DJOSER = {
         'user': 'api.serializers.UserReadSerializer',
         'current_user': 'api.serializers.UserReadSerializer',
         'token_create': 'api.serializers.TokenCreateSerializer',
+        'password_reset': 'api.serializers.CustomSendEmailResetSerializer',
     },
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
@@ -146,6 +147,7 @@ DJOSER = {
     'HIDE_USERS': True,
     'SEND_ACTIVATION_EMAIL': True,
     'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'password_reset_confirm/{uid}/{token}',
 }
 
 # SendGrid settings
