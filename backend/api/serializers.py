@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
+from django.core.validators import RegexValidator
 from djoser.conf import settings
 from djoser.serializers import (
+    SendEmailResetSerializer,
     TokenCreateSerializer,
     UserCreateSerializer,
     UserSerializer,
@@ -183,3 +185,23 @@ class CustomTokenCreateSerializer(TokenCreateSerializer):
         if self.user:
             return attrs
         self.fail("invalid_credentials")
+
+
+class CustomSendEmailResetSerializer(SendEmailResetSerializer):
+    phone_last_digits = serializers.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^\d{4}$',
+                message='Здесь должны быть последние 4 цифры телефона.',
+            )
+        ]
+    )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not User.objects.filter(
+                phone_number__endswith=attrs['phone_last_digits'],
+                email=attrs['email']
+        ).exists():
+            raise serializers.ValidationError('Неверные данные пользователя.')
+        return attrs
