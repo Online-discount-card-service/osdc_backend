@@ -7,6 +7,7 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from djoser import utils
 from djoser.conf import settings
 from djoser.serializers import (
     SendEmailResetSerializer,
@@ -25,6 +26,7 @@ from users.passwordvalidators import (
     NumberValidator,
     UppercaseValidator,
 )
+from users.tokens import custom_token_generator
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -243,7 +245,7 @@ class CustomTokenCreateSerializer(TokenCreateSerializer):
         self.fail("invalid_credentials")
 
 
-class CustomSendEmailResetSerializer(SendEmailResetSerializer):
+class CustomSendEmailResetPasswordSerializer(SendEmailResetSerializer):
     phone_last_digits = serializers.CharField(
         validators=[
             RegexValidator(
@@ -261,3 +263,46 @@ class CustomSendEmailResetSerializer(SendEmailResetSerializer):
         ).exists():
             raise serializers.ValidationError('Неверные данные пользователя.')
         return attrs
+
+
+class CustomUidAndTokenSerializer(serializers.Serializer):
+
+    uid = serializers.CharField()
+    token = serializers.CharField()
+
+    default_error_messages = {
+        "invalid_token": settings.CONSTANTS.messages.INVALID_TOKEN_ERROR,
+        "invalid_uid": settings.CONSTANTS.messages.INVALID_UID_ERROR,
+    }
+
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+        try:
+            uid = utils.decode_uid(self.initial_data.get("uid", ""))
+            self.user = User.objects.get(pk=uid)
+        except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+            key_error = "invalid_uid"
+            raise ValidationError(
+                {"uid": [self.error_messages[key_error]]}, code=key_error
+            )
+
+        is_token_valid = custom_token_generator.check_token(
+            self.user, self.initial_data.get("token", "")
+        )
+
+        if is_token_valid:
+            return validated_data
+        else:
+            key_error = "invalid_token"
+            raise ValidationError(
+                {"token": [self.error_messages[key_error]]}, code=key_error
+            )
+
+
+class CustomActivationSerializer(CustomUidAndTokenSerializer):
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not self.user.is_active:
+            return attrs
+        raise ValidationError('Почта уже подтверждена.')

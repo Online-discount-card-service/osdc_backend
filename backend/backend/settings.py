@@ -139,7 +139,11 @@ DJOSER = {
         'user': 'api.serializers.UserReadSerializer',
         'current_user': 'api.serializers.UserReadSerializer',
         'token_create': 'api.serializers.CustomTokenCreateSerializer',
-        'password_reset': 'api.serializers.CustomSendEmailResetSerializer',
+        'password_reset': 'api.serializers.CustomSendEmailResetPasswordSerializer',
+        'activation': 'api.serializers.CustomActivationSerializer',
+    },
+    'EMAIL': {
+        "activation": "api.email.CustomActivationEmail",
     },
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
