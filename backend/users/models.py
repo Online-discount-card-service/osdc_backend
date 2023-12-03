@@ -51,7 +51,7 @@ class User(AbstractUser):
         blank=False,
         max_length=MAX_LENGTH_NAME,
         validators=[RegexValidator(
-            regex=r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']$",
+            r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
             message='Имя может содержать только буквы, пробелы и спецсимволы.',
         )]
     )
