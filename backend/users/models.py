@@ -51,8 +51,8 @@ class User(AbstractUser):
         blank=False,
         max_length=MAX_LENGTH_NAME,
         validators=[RegexValidator(
-            regex=r'^[a-zA-Zа-яА-ЯёЁ\s-]{1,60}$',
-            message='Имя может содержать только буквы, пробелы и тире',
+            regex=r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']$",
+            message='Имя может содержать только буквы, пробелы и спецсимволы.',
         )]
     )
 
@@ -63,10 +63,9 @@ class User(AbstractUser):
         max_length=LEN_NUMBER,
         validators=[RegexValidator(
             regex=r'^\d{10}$',
-            message='Номер телефона после +7 начинается с 9'
+            message='Номер телефона 10 цифр после +7'
         )],
         blank=False,
-        unique=True
     )
 
     is_active = models.BooleanField(
