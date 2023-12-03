@@ -13,11 +13,23 @@ from .views import (
 )
 
 
+DJOSER_METHODS_TO_EXCLUDE = (
+    'user-reset-username',
+    'user-reset-username-confirm',
+    'user-set-password',
+    'user-set-username',
+)
+
 app_name = 'api'
 
-router = DefaultRouter()
+djoser_router = DefaultRouter()
+djoser_router.register('users', CustomUserViewSet)
+users_urls = [
+    url_pattern for url_pattern in djoser_router.urls
+    if url_pattern.name not in DJOSER_METHODS_TO_EXCLUDE
+]
 
-router.register('users', CustomUserViewSet)
+router = DefaultRouter()
 router.register('cards', CardViewSet)
 router.register('shops', ShopViewSet)
 router.register('groups', GroupViewSet)
@@ -34,8 +46,11 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-
 urlpatterns = [
+    path(
+        'v1/',
+        include(users_urls)
+    ),
     path(
         'v1/',
         include(router.urls)
