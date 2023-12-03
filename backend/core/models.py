@@ -42,7 +42,7 @@ class Shop(models.Model):
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название магазина',
         validators=[RegexValidator(
-            regex=r'^[0-9a-zA-Zа-яА-ЯёЁ\s\S]{1,30}$',
+            r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
             message='Название может содержать только буквы, цифры, пробелы'
             'и спецсимволы.',
         )],
@@ -87,7 +87,7 @@ class Card(models.Model):
         blank=False,
         verbose_name='Название карты',
         validators=[RegexValidator(
-            regex=r'^[0-9a-zA-Zа-яА-ЯёЁ\s\S]{1,30}$',
+            r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
             message='Название может содержать только буквы, цифры, пробелы'
             'и спецсимволы.',
         )],
@@ -112,10 +112,9 @@ class Card(models.Model):
         max_length=MAX_LENGTH_CARD_NUMBER,
         verbose_name='Номер карты',
         validators=[RegexValidator(
-            regex=r'^[0-9A-Za-zА-Яа-я\s-_]{1,40}$',
-            message=
-            'Номер карты может содержать только буквы, цифры, пробелы, тире'
-            'и нижнее подчеркивание.',
+            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
+            message='Номер карты может содержать только буквы, цифры,'
+            'пробелы, тире и нижнее подчеркивание.',
         )],
         blank=True
     )
@@ -123,10 +122,9 @@ class Card(models.Model):
         max_length=MAX_LENGTH_CARD_NUMBER,
         verbose_name='Номер штрих-кода',
         validators=[RegexValidator(
-            regex=r'^[0-9A-Za-zА-Яа-я\s-_]{1,40}$',
-            message=
-            'Номер штрих-кода может содержать только буквы, цифры, пробелы,'
-            'тире и нижнее подчеркивание.',
+            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
+            message='Номер штрих-кода может содержать только буквы, цифры, '
+            'пробелы, тире и нижнее подчеркивание.',
         )],
         blank=True
     )
