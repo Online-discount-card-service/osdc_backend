@@ -17,14 +17,15 @@ class IsCardsUser(permissions.BasePermission):
         if request.method == 'PATCH':
             user_card = get_object_or_404(UserCards, user=user, card=obj)
             return user_card.owner
-        return (request.user.is_authenticated
-                and UserCards.objects.filter(user=user, card=obj).exists)
+        return UserCards.objects.filter(user=user, card=obj).exists
 
 
 class IsShopCreatorOrReadOnly(permissions.IsAuthenticated):
     """Разрешения: магазины можно читать, редактировать может только автор."""
 
     def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         if request.method == 'PATCH':
             user = request.user
             card = Card.objects.get(shop=obj)
@@ -33,7 +34,7 @@ class IsShopCreatorOrReadOnly(permissions.IsAuthenticated):
                 user_card.owner
                 and not obj.validation
             )
-        return request.method in permissions.SAFE_METHODS
+        return False
 
 
 class IsUserEmailOwner(permissions.IsAuthenticated):
