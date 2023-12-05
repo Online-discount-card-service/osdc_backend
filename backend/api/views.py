@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from djoser.permissions import CurrentUserOrAdmin
 from djoser.views import TokenDestroyView, UserViewSet
@@ -18,6 +19,7 @@ from .serializers import (
     CardSerializer,
     CardShopCreateSerializer,
     CardsListSerializer,
+    EmailSerializer,
     GroupSerializer,
     ShopCreateSerializer,
     ShopSerializer,
@@ -330,6 +332,66 @@ class CardViewSet(viewsets.ModelViewSet):
                 serializer = CardsListSerializer(user_card)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             raise StatisticsError
+
+    @swagger_auto_schema(
+        methods=['POST'],
+        request_body=EmailSerializer(),
+        responses={
+            status.HTTP_200_OK: None,
+            status.HTTP_201_CREATED: None,
+        },
+        operation_summary='Добавление карты в список друзьям',
+        operation_description='''
+            Ищет пользователя по е-мейл.
+            Если такой пользователь есть,
+            карта по id добавляется ему в список карт.
+            Если нет, ему на почту направляется
+            письмо-приглашение в приложение.
+            '''
+    )
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[IsAuthenticated],
+    )
+    def share(self, request, pk):
+        serializer = EmailSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.data['email']
+            card = Card.objects.get(id=pk)
+            if not User.objects.filter(email=email).exists():
+                email_text = (
+                    f'Пользователь приложения Скидывай хотел поделиться '
+                    f'с вами скидочной картой магазина {card.shop}.\n'
+                    f'K сожалению, вас нет в нашем приложении.'
+                    f'\nПрисоединяйтесь! '
+                    f'https://skidivay.acceleratorpracticum.ru'
+                )
+                send_mail(
+                    'C вами хотят поделиться скидочной картой',
+                    f'{email_text}',
+                    'no-reply@skidivay.acceleratorpracticum.ru',
+                    [f'{email}'],
+                    fail_silently=False,
+                )
+                return Response(
+                    {
+                        'message':
+                        f'Пользователя с таким емейл нет, '
+                        f'но мы направили ему приглашение.'
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            friend = User.objects.get(email=email)
+            UserCards.objects.create(user=friend, card=card, owner=False)
+            return Response(
+                {
+                    'message':
+                    f'Вы успешно поделились картой с пользователем, '
+                    f'чья почта {email}!'
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
 
 class ShopViewSet(viewsets.ModelViewSet):
