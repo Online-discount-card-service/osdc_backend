@@ -16,7 +16,6 @@ from .views import (
 DJOSER_METHODS_TO_EXCLUDE = (
     'user-reset-username',
     'user-reset-username-confirm',
-    'user-set-password',
     'user-set-username',
 )
 
