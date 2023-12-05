@@ -184,6 +184,10 @@ class UserReadSerializer(UserSerializer):
         )
 
 
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
 class UserPreCheckSerializer(serializers.ModelSerializer):
     """Сериализатор для проверки почты и пароля."""
 
