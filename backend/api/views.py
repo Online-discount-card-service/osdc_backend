@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from djoser.permissions import CurrentUserOrAdmin
 from djoser.views import TokenDestroyView, UserViewSet
@@ -12,6 +11,7 @@ from rest_framework.response import Response
 
 from core.models import Card, Group, Shop, UserCards
 
+from .email import InvitationEmail
 from .exceptions import StatisticsError
 from .permissions import IsCardsUser, IsShopCreatorOrReadOnly
 from .serializers import (
@@ -358,26 +358,16 @@ class CardViewSet(viewsets.ModelViewSet):
         serializer = EmailSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
-            card = Card.objects.get(id=pk)
+            card = get_object_or_404(Card, id=pk)
             if not User.objects.filter(email=email).exists():
-                email_text = (
-                    f'Пользователь приложения Скидывай хотел поделиться '
-                    f'с вами скидочной картой магазина {card.shop}.\n'
-                    f'K сожалению, вас нет в нашем приложении.'
-                    f'\nПрисоединяйтесь! '
-                    f'https://skidivay.acceleratorpracticum.ru'
-                )
-                send_mail(
-                    'C вами хотят поделиться скидочной картой',
-                    f'{email_text}',
-                    'no-reply@skidivay.acceleratorpracticum.ru',
-                    [f'{email}'],
-                    fail_silently=False,
-                )
+                InvitationEmail(
+                    self.request,
+                    context={'card': card}
+                ).send(to=[f'{email}'])
                 return Response(
                     {
                         'message':
-                        f'Пользователя с таким емейл нет, '
+                        f'Пользователя с таким емейл ({email}) нет, '
                         f'но мы направили ему приглашение.'
                     },
                     status=status.HTTP_200_OK,
