@@ -9,7 +9,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from core.consts import ErrorMessage, Message
 from core.models import Card, Group, Shop, UserCards
 
 from .email import InvitationEmail
@@ -70,7 +69,7 @@ class CustomTokenDestroyView(TokenDestroyView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response(
-            {'message': Message.LOGOUT_SUCCESS},
+            {'message': 'Вы успешно вышли из учетной записи.'},
             status=status.HTTP_200_OK
         )
 
@@ -203,7 +202,7 @@ class CardViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         return Response(
-            {'message': Message.CARD_DELETION_SUCCESS},
+            {'message': 'Карта успешно удалена.'},
             status=status.HTTP_200_OK
         )
 
@@ -292,7 +291,7 @@ class CardViewSet(viewsets.ModelViewSet):
                 or (not user_card.favourite and request.method == 'DELETE')
         ):
             raise serializers.ValidationError(
-                ErrorMessage.CARD_STATUS_AS_REQUESTED)
+                'Статус карты уже соответствует запрашиваемому.')
         if request.method in ('POST', 'DELETE'):
             user_card.favourite = not user_card.favourite
             user_card.save()
@@ -306,7 +305,7 @@ class CardViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=operation_status)
 
         raise serializers.ValidationError(
-            {"errors": ErrorMessage.GENERAL_ERROR}
+            {"errors": "Что-то пошло не так."}
         )
 
     @swagger_auto_schema(
@@ -365,19 +364,21 @@ class CardViewSet(viewsets.ModelViewSet):
                     self.request,
                     context={'card': card}
                 ).send(to=[f'{email}'])
-                message = Message.invitation_message_create(self, email=email)
                 return Response(
                     {
-                        'message': message
+                        'message':
+                        f'Пользователя с таким емейл ({email}) нет, '
+                        f'но мы направили ему приглашение.'
                     },
                     status=status.HTTP_200_OK,
                 )
             friend = User.objects.get(email=email)
             UserCards.objects.create(user=friend, card=card, owner=False)
-            message = Message.successful_sharing(self, email=email)
             return Response(
                 {
-                    'message': message
+                    'message':
+                    f'Вы успешно поделились картой с пользователем, '
+                    f'чья почта {email}!'
                 },
                 status=status.HTTP_201_CREATED,
             )
