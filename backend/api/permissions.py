@@ -3,6 +3,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import permissions, serializers
 
+from core.consts import ErrorMessage
 from core.models import Card, UserCards
 
 
@@ -47,7 +48,7 @@ class IsUserEmailOwner(permissions.IsAuthenticated):
         uid = request.data.get('uid')
         if uid is None:
             raise serializers.ValidationError(
-                {'uid': 'Обязательное поле.'})
+                {'uid': ErrorMessage.MUST_HAVE})
 
         try:
             id_from_email = int(
@@ -57,6 +58,6 @@ class IsUserEmailOwner(permissions.IsAuthenticated):
             )
         except (KeyError, TypeError, ValueError):
             raise serializers.ValidationError(
-                {'uid': 'Неверный формат uid.'})
+                {'uid': ErrorMessage.INCORRECT_UID})
 
         return request.user.id == id_from_email
