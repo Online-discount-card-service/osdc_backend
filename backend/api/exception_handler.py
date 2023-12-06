@@ -28,8 +28,8 @@ def handle_api_exception(exc, response):
         headers=response.headers
     )
 
-    if exc.status_code in ErrorMessage.ERROR_MESSAGES:
-        response.data['message'] = ErrorMessage.ERROR_MESSAGES.get(
+    if exc.status_code in ErrorMessage.STATUS_ERROR_MESSAGES:
+        response.data['message'] = ErrorMessage.STATUS_ERROR_MESSAGES.get(
             exc.status_code
         )
     elif 500 <= exc.status_code <= 599:

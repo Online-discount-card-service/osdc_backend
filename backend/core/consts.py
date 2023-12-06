@@ -24,7 +24,7 @@ ENCODING_TYPE = (
 
 
 class ErrorMessage:
-    ERROR_MESSAGES = {
+    STATUS_ERROR_MESSAGES = {
         400: 'Введены некорректные данные.',
         401: 'Ошибка авторизации.',
         403: 'Ошибка авторизации.',
@@ -62,7 +62,7 @@ class ErrorMessage:
         'Счётчик использования можно только увеличить!'
     )
     INCORRECT_USERS_DATA = 'Неверные данные пользователя.'
-    INVALID_CREDENTIALS = 'invalid_credentials'
+    INVALID_CREDENTIALS = 'Неверные учетные данные.'
     MUST_HAVE = 'Обязательное поле.'
     NAME_INCORRECT = 'Имя может содержать только буквы, пробелы и спецсимволы.'
     NO_EMAIL_ON_USER_CREATION = 'Электронная почта должна быть установлена.'
@@ -81,8 +81,10 @@ class ErrorMessage:
         'Здесь должны быть последние 4 цифры телефона.'
     )
     SERVER_ERROR = 'Ошибка сервера.'
-    SUPERUSER_NOT_STAFF = 'Superuser must have is_staff=True.'
-    SUPERUSER_NOT_SUPERUSER = 'Superuser must have is_superuser=True.'
+    SUPERUSER_NOT_STAFF = 'У суперпользователя должно быть is_staff=True.'
+    SUPERUSER_NOT_SUPERUSER = (
+        'У суперпользователя должно быть is_superuser=True.'
+    )
     TELEPHONE_NUMBER_INCORRECT = 'Номер телефона 10 цифр после +7.'
     TOO_SIMILAR_DATA = 'Пароль слишком похож на е-мейл.'
 
