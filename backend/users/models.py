@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from core.consts import ErrorMessage
 from users.consts import LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 
@@ -13,7 +14,7 @@ class CustomUserManager(BaseUserManager):
         """Создает и сохраняет пользователя с указанным email и паролем."""
 
         if not email:
-            raise ValueError(_('Электронная почта должна быть установлена'))
+            raise ValueError(_(f'{ErrorMessage.NO_EMAIL_ON_USER_CREATION}'))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.password = make_password(password)
@@ -26,9 +27,9 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
 
         if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
+            raise ValueError(f'{ErrorMessage.SUPERUSER_NOT_STAFF}')
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
+            raise ValueError(f'{ErrorMessage.SUPERUSER_NOT_SUPERUSER}')
 
         return self.create_user(email, password, **extra_fields)
 
@@ -41,7 +42,7 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         error_messages={
-            'unique': _('Пользователь с таким email уже существует')
+            'unique': _(f'{ErrorMessage.NONUNIQUE_EMAIL}')
         },
         max_length=MAX_LENGTH_EMAIL
     )
@@ -52,7 +53,7 @@ class User(AbstractUser):
         max_length=MAX_LENGTH_NAME,
         validators=[RegexValidator(
             r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
-            message='Имя может содержать только буквы, пробелы и спецсимволы.',
+            message=ErrorMessage.NAME_INCORRECT,
         )]
     )
 
@@ -63,7 +64,7 @@ class User(AbstractUser):
         max_length=LEN_NUMBER,
         validators=[RegexValidator(
             regex=r'^\d{10}$',
-            message='Номер телефона 10 цифр после +7'
+            message=ErrorMessage.TELEPHONE_NUMBER_INCORRECT
         )],
         blank=False,
     )
