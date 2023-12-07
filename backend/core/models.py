@@ -11,6 +11,7 @@ from .consts import (
     MAX_LENGTH_ENCODING_TYPE,
     MAX_LENGTH_GROUP_NAME,
     MAX_LENGTH_SHOP_NAME,
+    ErrorMessage,
 )
 from .validators import validate_color_format
 
@@ -43,8 +44,7 @@ class Shop(models.Model):
         verbose_name='Название магазина',
         validators=[RegexValidator(
             r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
-            message='Название может содержать только буквы, цифры, пробелы'
-            'и спецсимволы.',
+            message=ErrorMessage.INCORRECT_SHOP_TITLE,
         )],
     )
     group = models.ManyToManyField(
@@ -88,8 +88,7 @@ class Card(models.Model):
         verbose_name='Название карты',
         validators=[RegexValidator(
             r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
-            message='Название может содержать только буквы, цифры, пробелы'
-            'и спецсимволы.',
+            message=ErrorMessage.INCORRECT_CARD_TITLE,
         )],
     )
     shop = models.ForeignKey(
@@ -113,8 +112,7 @@ class Card(models.Model):
         verbose_name='Номер карты',
         validators=[RegexValidator(
             regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
-            message='Номер карты может содержать только буквы, цифры,'
-            'пробелы, тире и нижнее подчеркивание.',
+            message=ErrorMessage.INCORRECT_CARD_NUMBER,
         )],
         blank=True
     )
@@ -123,8 +121,7 @@ class Card(models.Model):
         verbose_name='Номер штрих-кода',
         validators=[RegexValidator(
             regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
-            message='Номер штрих-кода может содержать только буквы, цифры, '
-            'пробелы, тире и нижнее подчеркивание.',
+            message=ErrorMessage.INCORRECT_BARCODE,
         )],
         blank=True
     )
