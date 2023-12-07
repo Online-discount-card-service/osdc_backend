@@ -17,7 +17,7 @@ from djoser.serializers import (
 )
 from rest_framework import serializers
 
-from core.consts import MAX_NUM_CARD_USE_BY_USER
+from core.consts import MAX_NUM_CARD_USE_BY_USER, ErrorMessage
 from core.models import Card, Group, Shop, UserCards
 from users.consts import MAX_SIMILARITY, MIN_PASSWORD_LENGTH
 from users.models import User
@@ -97,7 +97,7 @@ class CardEditSerializer(serializers.ModelSerializer):
                 or data.get('barcode_number')
         ):
             raise serializers.ValidationError(
-                'Необходимо указать номер карты и/или штрих-кода')
+                ErrorMessage.CARD_HAS_NO_BARCODE_OR_NUMBER)
         return data
 
     def to_representation(self, instance):
@@ -205,7 +205,7 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
         email = data.get('email')
         sequence_matcher = SequenceMatcher(a=password.lower(), b=email.lower())
         if sequence_matcher.quick_ratio() > MAX_SIMILARITY:
-            raise serializers.ValidationError("Пароль слишком похож на е-мейл")
+            raise serializers.ValidationError(ErrorMessage.TOO_SIMILAR_DATA)
         return super(UserPreCheckSerializer, self).validate(data)
 
     def validate_password(self, data):
@@ -243,7 +243,7 @@ class CustomTokenCreateSerializer(TokenCreateSerializer):
         if not self.user:
             self.user = User.objects.filter(**params).first()
             if self.user and not self.user.check_password(password):
-                self.fail("invalid_credentials")
+                self.fail(ErrorMessage.INVALID_CREDENTIALS)
         if self.user:
             return attrs
         self.fail("invalid_credentials")
@@ -254,7 +254,7 @@ class CustomSendEmailResetPasswordSerializer(SendEmailResetSerializer):
         validators=[
             RegexValidator(
                 regex=r'^\d{4}$',
-                message='Здесь должны быть последние 4 цифры телефона.',
+                message=ErrorMessage.PHONE_LAST_DIGITS_ARE_NOT_DIGITS,
             )
         ]
     )
@@ -265,7 +265,9 @@ class CustomSendEmailResetPasswordSerializer(SendEmailResetSerializer):
                 phone_number__endswith=attrs['phone_last_digits'],
                 email=attrs['email']
         ).exists():
-            raise serializers.ValidationError('Неверные данные пользователя.')
+            raise serializers.ValidationError(
+                ErrorMessage.INCORRECT_USERS_DATA
+            )
         return attrs
 
 
@@ -309,4 +311,4 @@ class CustomActivationSerializer(CustomUidAndTokenSerializer):
         attrs = super().validate(attrs)
         if not self.user.is_active:
             return attrs
-        raise ValidationError('Почта уже подтверждена.')
+        raise ValidationError(ErrorMessage.EMAIL_ALREADY_ACTIVATED)
