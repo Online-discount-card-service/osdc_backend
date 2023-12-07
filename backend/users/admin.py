@@ -35,4 +35,4 @@ class UserAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ('id','last_login', 'date_joined',)
+    readonly_fields = ('id', 'last_login', 'date_joined',)

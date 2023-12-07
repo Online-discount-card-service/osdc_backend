@@ -1,10 +1,7 @@
-from difflib import SequenceMatcher
+# from difflib import SequenceMatcher
 
 from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import (
-    CommonPasswordValidator,
-    NumericPasswordValidator,
-)
+from django.contrib.auth.password_validation import NumericPasswordValidator
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from djoser import utils
@@ -19,7 +16,7 @@ from rest_framework import serializers
 
 from core.consts import MAX_NUM_CARD_USE_BY_USER, ErrorMessage
 from core.models import Card, Group, Shop, UserCards
-from users.consts import MAX_SIMILARITY, MIN_PASSWORD_LENGTH
+from users.consts import MIN_PASSWORD_LENGTH  # MAX_SIMILARITY
 from users.models import User
 from users.passwordvalidators import (
     LowercaseValidator,
@@ -203,9 +200,9 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
     # def validate(self, data):
         # password = data.get('password')
         # email = data.get('email')
-        # sequence_matcher = SequenceMatcher(a=password.lower(), b=email.lower())
-        # if sequence_matcher.quick_ratio() > MAX_SIMILARITY:
-            # raise serializers.ValidationError(ErrorMessage.TOO_SIMILAR_DATA)
+        # sequence_match = SequenceMatcher(a=password.lower(), b=email.lower())
+        # if sequence_match.quick_ratio() > MAX_SIMILARITY:
+        #     raise serializers.ValidationError(ErrorMessage.TOO_SIMILAR_DATA)
         # return super(UserPreCheckSerializer, self).validate(data)
 
     def validate_password(self, data):
@@ -217,10 +214,10 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
             LowercaseValidator
         )
         # try:
-            # validator = CommonPasswordValidator()
-            # validator.validate(password=data, user=None)
+        #     validator = CommonPasswordValidator()
+        #     validator.validate(password=data, user=None)
         # except ValidationError as error:
-            # errors.append(error)
+        #      errors.append(error)
         for validator in password_validators:
             try:
                 validator.validate(self, password=data, user=None)
