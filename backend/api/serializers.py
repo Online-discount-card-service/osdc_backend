@@ -200,13 +200,13 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'password')
 
-    def validate(self, data):
-        password = data.get('password')
-        email = data.get('email')
-        sequence_matcher = SequenceMatcher(a=password.lower(), b=email.lower())
-        if sequence_matcher.quick_ratio() > MAX_SIMILARITY:
-            raise serializers.ValidationError(ErrorMessage.TOO_SIMILAR_DATA)
-        return super(UserPreCheckSerializer, self).validate(data)
+    # def validate(self, data):
+        # password = data.get('password')
+        # email = data.get('email')
+        # sequence_matcher = SequenceMatcher(a=password.lower(), b=email.lower())
+        # if sequence_matcher.quick_ratio() > MAX_SIMILARITY:
+            # raise serializers.ValidationError(ErrorMessage.TOO_SIMILAR_DATA)
+        # return super(UserPreCheckSerializer, self).validate(data)
 
     def validate_password(self, data):
         errors = []
@@ -216,11 +216,11 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
             UppercaseValidator,
             LowercaseValidator
         )
-        try:
-            validator = CommonPasswordValidator()
-            validator.validate(password=data, user=None)
-        except ValidationError as error:
-            errors.append(error)
+        # try:
+            # validator = CommonPasswordValidator()
+            # validator.validate(password=data, user=None)
+        # except ValidationError as error:
+            # errors.append(error)
         for validator in password_validators:
             try:
                 validator.validate(self, password=data, user=None)

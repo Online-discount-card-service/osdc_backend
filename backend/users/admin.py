@@ -12,6 +12,7 @@ class CardsInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'email',
         'name',
         'phone_number',
@@ -34,4 +35,4 @@ class UserAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ('last_login', 'date_joined',)
+    readonly_fields = ('id','last_login', 'date_joined',)
