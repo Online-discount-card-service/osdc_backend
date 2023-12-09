@@ -360,6 +360,12 @@ class CardViewSet(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
             card = get_object_or_404(Card, id=pk)
+            if request.user.email == email:
+                message = ErrorMessage.cannot_share_with_self(
+                    self,
+                    email=email
+                )
+                raise serializers.ValidationError(message)
             if not User.objects.filter(email=email).exists():
                 InvitationEmail(
                     self.request,
@@ -372,12 +378,6 @@ class CardViewSet(viewsets.ModelViewSet):
                     },
                     status=status.HTTP_200_OK,
                 )
-            if request.user.email == email:
-                message = ErrorMessage.cannot_share_with_self(
-                    self,
-                    email=email
-                )
-                raise serializers.ValidationError(message)
             friend = User.objects.get(email=email)
             if UserCards.objects.filter(user=friend, card=card).exists():
                 message = ErrorMessage.card_already_shared(self, email)

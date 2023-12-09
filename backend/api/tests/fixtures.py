@@ -72,6 +72,7 @@ class APITests(APITestCase):
                 phone_number=f'+7999999999{user_num}',
             )
         cls.user = User.objects.order_by().first()
+        cls.another_user = User.objects.order_by()[1]
 
         for card_num in range(cls.CARDS_USER_HAVE):
             UserCards.objects.create(
