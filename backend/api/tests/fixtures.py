@@ -39,6 +39,7 @@ class APITests(APITestCase):
         cls.SHOPS_VERIFY = 5
         cls.GROUPS = 5
         cls.USERS = 3
+        cls.EMAIL_NOT_OF_A_USER = 'share-invitation-test@example.com'
 
         for group_num in range(cls.GROUPS):
             Group.objects.create(name=f'Test Group #{group_num}')

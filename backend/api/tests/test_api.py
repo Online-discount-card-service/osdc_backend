@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core import mail
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
@@ -383,6 +384,29 @@ class EndpointsTestCase(APITests):
             len(card_shared_with_self),
             'Картой можно поделиться с самим собой.'
         )
+
+    def test_card_share_with_non_user(self):
+        """Проверка возможности отправить приглашение на е-мейл."""
+
+        url = reverse(
+            'api:card-detail',
+            kwargs={'pk': f'{self.card_user_not_fav.id}'}
+        ) + 'share/'
+        email = self.EMAIL_NOT_OF_A_USER
+        response = self.auth_client.post(url, {'email': email}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            len(mail.outbox),
+            1,
+            'Не удалось отправить письмо-приглашение.'
+        )
+        self.assertIn(
+            "С вами хотят поделитсья скидочной картой на сайте",
+            mail.outbox[0].subject
+        )
+        self.assertIn(email, mail.outbox[0].recipients())
+        context = mail.outbox[0].get_context_data()
+        self.assertEqual(context['card'], self.card_user_not_fav)
 
 
 class ShopEditTestCase(APIShopEditTests):
