@@ -91,6 +91,18 @@ class ErrorMessage:
     TELEPHONE_NUMBER_INCORRECT = 'Номер телефона 10 цифр после +7.'
     TOO_SIMILAR_DATA = 'Пароль слишком похож на е-мейл.'
 
+    def cannot_share_with_self(self, email):
+        return (
+            f'Указанный Вами е-мейл {email} - это Ваш е-мейл. '
+            f'Вы не можете поделиться картой с самим собой.'
+        )
+
+    def card_already_shared(self, email):
+        return (
+            f'У пользователя с е-мейл {email} '
+            f'уже есть данная карта.'
+        )
+
 
 class Message:
     CARD_DELETION_SUCCESS = 'Карта успешно удалена.'

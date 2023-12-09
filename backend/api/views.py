@@ -372,7 +372,16 @@ class CardViewSet(viewsets.ModelViewSet):
                     },
                     status=status.HTTP_200_OK,
                 )
+            if request.user.email == email:
+                message = ErrorMessage.cannot_share_with_self(
+                    self,
+                    email=email
+                )
+                raise serializers.ValidationError(message)
             friend = User.objects.get(email=email)
+            if UserCards.objects.filter(user=friend, card=card).exists():
+                message = ErrorMessage.card_already_shared(self, email)
+                raise serializers.ValidationError(message)
             UserCards.objects.create(user=friend, card=card, owner=False)
             message = Message.successful_sharing(self, email)
             return Response(
