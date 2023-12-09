@@ -240,10 +240,10 @@ class CustomTokenCreateSerializer(TokenCreateSerializer):
         if not self.user:
             self.user = User.objects.filter(**params).first()
             if self.user and not self.user.check_password(password):
-                self.fail(ErrorMessage.INVALID_CREDENTIALS)
+                raise ValidationError(ErrorMessage.INVALID_CREDENTIALS)
         if self.user:
             return attrs
-        self.fail("invalid_credentials")
+        raise ValidationError(ErrorMessage.INVALID_CREDENTIALS)
 
 
 class CustomSendEmailResetPasswordSerializer(SendEmailResetSerializer):
