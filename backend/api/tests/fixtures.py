@@ -39,6 +39,7 @@ class APITests(APITestCase):
         cls.SHOPS_VERIFY = 5
         cls.GROUPS = 5
         cls.USERS = 3
+        cls.EMAIL_NOT_OF_A_USER = 'share-invitation-test@example.com'
 
         for group_num in range(cls.GROUPS):
             Group.objects.create(name=f'Test Group #{group_num}')
@@ -72,6 +73,7 @@ class APITests(APITestCase):
                 phone_number=f'+7999999999{user_num}',
             )
         cls.user = User.objects.order_by().first()
+        cls.another_user = User.objects.order_by()[1]
 
         for card_num in range(cls.CARDS_USER_HAVE):
             UserCards.objects.create(
@@ -86,6 +88,11 @@ class APITests(APITestCase):
         cls.card_user_not_fav = Card.objects.get(
             card_number=f'{cls.CARDS_USER_FAV}'
         )
+        card_user_own = UserCards.objects.filter(
+            user=cls.user,
+            owner=True
+        ).order_by().first()
+        cls.card_user_own = card_user_own.card
 
         cls.CARDS_URL = reverse('api:card-list')
         cls.CARD_DETAIL_URL = reverse(

@@ -37,6 +37,7 @@ class ErrorMessage:
         429: 'Слишком много запросов.',
         431: 'Заголовок слишком большой.',
     }
+    CANNOT_SHARE_WITH_SELF = 'Вы не можете поделиться картой с самим собой.'
     CARD_HAS_NO_BARCODE_OR_NUMBER = (
         'Необходимо указать номер карты и/или штрих-кода.'
     )
@@ -90,6 +91,12 @@ class ErrorMessage:
     )
     TELEPHONE_NUMBER_INCORRECT = 'Номер телефона 10 цифр после +7.'
     TOO_SIMILAR_DATA = 'Пароль слишком похож на е-мейл.'
+
+    def card_already_shared(self, email):
+        return (
+            f'У пользователя с е-мейл {email} '
+            f'уже есть данная карта.'
+        )
 
 
 class Message:
