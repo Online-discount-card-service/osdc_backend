@@ -88,6 +88,11 @@ class APITests(APITestCase):
         cls.card_user_not_fav = Card.objects.get(
             card_number=f'{cls.CARDS_USER_FAV}'
         )
+        card_user_own = UserCards.objects.filter(
+            user=cls.user,
+            owner=True
+        ).order_by().first()
+        cls.card_user_own = card_user_own.card
 
         cls.CARDS_URL = reverse('api:card-list')
         cls.CARD_DETAIL_URL = reverse(

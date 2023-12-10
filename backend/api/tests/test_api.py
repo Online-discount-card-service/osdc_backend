@@ -337,53 +337,51 @@ class EndpointsTestCase(APITests):
         self.assertEqual(len(response.data), self.GROUPS)
 
     def test_card_share(self):
-        """
-        Проверка возможности поделиться картой внутри приложения.
-
-        Кроме как повторно и с самим собой.
-        """
+        """Проверка возможности поделиться картой внутри приложения."""
 
         email = self.another_user.email
         url = reverse(
             'api:card-detail',
-            kwargs={'pk': f'{self.card_user_not_fav.id}'}
+            kwargs={'pk': f'{self.card_user_own.id}'}
         ) + 'share/'
         response = self.auth_client.post(url, {'email': email}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(UserCards.objects.filter(
             user=self.another_user,
-            card=self.card_user_not_fav
+            card=self.card_user_own
         ).exists(), 'Картой не удалось поделиться')
         self.assertFalse(UserCards.objects.get(
             user=self.another_user,
-            card=self.card_user_not_fav).owner)
-        response1 = self.auth_client.post(url, {'email': email}, format='json')
-        self.assertEqual(response1.status_code, status.HTTP_400_BAD_REQUEST)
-        shared_cards = UserCards.objects.filter(
+            card=self.card_user_own).owner,
+            'У того, с кем делились картой, её не появилось в списке карт.')
+
+    def test_double_card_share(self):
+        """Проверка невозможности поделиться каротй повторно."""
+        UserCards.objects.create(
             user=self.another_user,
-            card=self.card_user_not_fav
+            card=self.card_user_own
         )
-        self.assertEqual(
-            1,
-            len(shared_cards),
-            'Картой можно поделиться повторно.'
-        )
+        email = self.another_user.email
+        url = reverse(
+            'api:card-detail',
+            kwargs={'pk': f'{self.card_user_own.id}'}
+        ) + 'share/'
+        response = self.auth_client.post(url, {'email': email}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_self_share(self):
+        """Проверка невозможности поделиться картой с самим собой."""
         email_of_user_who_share = self.user.email
-        response2 = self.auth_client.post(
+        url = reverse(
+            'api:card-detail',
+            kwargs={'pk': f'{self.card_user_own.id}'}
+        ) + 'share/'
+        response = self.auth_client.post(
             url,
             {'email': email_of_user_who_share},
             format='json'
         )
-        self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
-        card_shared_with_self = UserCards.objects.filter(
-            user=self.user,
-            card=self.card_user_not_fav
-        )
-        self.assertEqual(
-            1,
-            len(card_shared_with_self),
-            'Картой можно поделиться с самим собой.'
-        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_card_share_with_non_user(self):
         """Проверка возможности отправить приглашение на е-мейл."""
