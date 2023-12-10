@@ -1,0 +1,66 @@
+server {
+    server_tokens off;
+
+    gzip on;
+    gzip_disable "msie6";
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_types
+      application/atom+xml
+      application/geo+json
+      application/javascript
+      application/x-javascript
+      application/json
+      application/ld+json
+      application/manifest+json
+      application/rdf+xml
+      application/rss+xml
+      application/xhtml+xml
+      application/xml
+      font/eot
+      font/otf
+      font/ttf
+      image/svg+xml
+      text/css
+      text/javascript
+      text/plain
+      text/xml;
+
+    listen 80;
+
+    server_name $NGINX_HOST;
+
+    location /admin/ {
+        proxy_pass http://backend:8000;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+# TODO: убрать после тестирования почты
+
+    location /static/sent_emails/ {
+        alias /var/html/static/sent_emails/;
+        autoindex on;
+    }
+
+    location /static/ {
+        root /var/html/;
+    }
+
+    location /media/ {
+        root /var/html/;
+    }
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+        try_files $uri $uri/ /index.html =404;
+    }
+}

@@ -1,18 +1,30 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
 from django.db import models
 
-from .consts import (MAX_LENGTH_CARD_NAME, MAX_LENGTH_GROUP_NAME,
-                     MAX_LENGTH_SHOP_NAME)
+from .consts import (
+    EAN_13,
+    ENCODING_TYPE,
+    MAX_LENGTH_CARD_NAME,
+    MAX_LENGTH_CARD_NUMBER,
+    MAX_LENGTH_COLOR,
+    MAX_LENGTH_ENCODING_TYPE,
+    MAX_LENGTH_GROUP_NAME,
+    MAX_LENGTH_SHOP_NAME,
+    ErrorMessage,
+)
+from .validators import validate_color_format
+
 
 User = get_user_model()
 
 
 class Group(models.Model):
-    """Данный класс предназначен для создания в бд категорий"""
+    """Класс для представления Категории."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
-        help_text='Введите название категории'
     )
 
     class Meta:
@@ -25,20 +37,37 @@ class Group(models.Model):
 
 
 class Shop(models.Model):
-    """Клас предназначен для создания в бд перечня магазинов"""
+    """Клас для представления магазинов."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название магазина',
-        help_text='Введите название магазина'
+        validators=[RegexValidator(
+            r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
+            message=ErrorMessage.INCORRECT_SHOP_TITLE,
+        )],
+    )
+    group = models.ManyToManyField(
+        Group,
+        verbose_name='Категории',
+        blank=True
     )
     logo = models.ImageField(
         upload_to='shop/',
         verbose_name='Лого магазина',
-        help_text='Загрузите логотип магазина'
+        null=True,
+        blank=True
     )
-    group = models.ManyToManyField(
-        Group,
-        verbose_name='Категории'
+    color = models.CharField(
+        verbose_name='Цвет магазина',
+        max_length=MAX_LENGTH_COLOR,
+        validators=[validate_color_format],
+        blank=True,
+    )
+    validation = models.BooleanField(
+        verbose_name='Критерий валидации магазина',
+        blank=True,
+        default=False,
     )
 
     class Meta:
@@ -51,46 +80,64 @@ class Shop(models.Model):
 
 
 class Card(models.Model):
-    """Класс предназначен для создания карты пользователя в бд"""
+    """Класс для представления Карт."""
+
     name = models.CharField(
         max_length=MAX_LENGTH_CARD_NAME,
-        blank=True,
-        null=True,
-        verbose_name='Название магазина',
-        help_text='Введите название магазина',
-    )
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='owner',
-        verbose_name='Владелец'
+        blank=False,
+        verbose_name='Название карты',
+        validators=[RegexValidator(
+            r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
+            message=ErrorMessage.INCORRECT_CARD_TITLE,
+        )],
     )
     shop = models.ForeignKey(
         Shop,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         verbose_name='Магазин',
-        help_text='Выберите магазин',
-        blank=True,
-        null=True
+        blank=False,
+        null=False,
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата добавления карты',
         auto_now_add=True,
     )
-    image_card = models.ImageField(
+    image = models.ImageField(
         upload_to='card/',
         verbose_name='Изображение карты',
-        help_text='Загрузите изображение'
+        blank=True,
     )
-    image_gtin = models.ImageField(
-        upload_to='gtin/',
-        verbose_name='Изображение штрих-кода',
-        help_text='Загрузите изображение штрих-кода',
+    card_number = models.CharField(
+        max_length=MAX_LENGTH_CARD_NUMBER,
+        verbose_name='Номер карты',
+        validators=[RegexValidator(
+            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
+            message=ErrorMessage.INCORRECT_CARD_NUMBER,
+        )],
         blank=True
     )
-    group = models.ManyToManyField(
-        Group,
-        verbose_name='Категории'
+    barcode_number = models.CharField(
+        max_length=MAX_LENGTH_CARD_NUMBER,
+        verbose_name='Номер штрих-кода',
+        validators=[RegexValidator(
+            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
+            message=ErrorMessage.INCORRECT_BARCODE,
+        )],
+        blank=True
+    )
+    encoding_type = models.CharField(
+        max_length=MAX_LENGTH_ENCODING_TYPE,
+        verbose_name='Тип кодировки бар-кода карты',
+        choices=ENCODING_TYPE,
+        default=EAN_13,
+        blank=True
+    )
+    users = models.ManyToManyField(
+        User,
+        through='UserCards',
+        through_fields=('card', 'user'),
+        verbose_name='Пользователи',
+        blank=False
     )
 
     class Meta:
@@ -99,22 +146,38 @@ class Card(models.Model):
         verbose_name_plural = 'Карты'
 
     def __str__(self):
-        return self.name
+        return f'{self.name}({self.shop})'
 
 
-class Favourites(models.Model):
-    """Класс предназначет для хранения в бд списка избраных
-    карт пользователя"""
+class UserCards(models.Model):
+    """Карты пользователя."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_favourites',
+        related_name='cards',
         verbose_name='Пользователь'
     )
     card = models.ForeignKey(
         Card,
         on_delete=models.CASCADE,
-        related_name='card_favourites'
+        related_name='+',
+        verbose_name='Карты'
+    )
+    owner = models.BooleanField(
+        verbose_name='Владелец карты',
+        blank=True,
+        default=True,
+    )
+    favourite = models.BooleanField(
+        verbose_name='Избранное',
+        blank=True,
+        default=False,
+    )
+    usage_counter = models.PositiveBigIntegerField(
+        verbose_name='Количество использований карты',
+        default=0,
+        blank=True
     )
 
     class Meta:
@@ -127,9 +190,9 @@ class Favourites(models.Model):
                 name='uniq_favorites'
             ),
         )
-        verbose_name = 'Список избранного'
-        verbose_name_plural = 'Список избранного'
+        verbose_name = 'Карта пользователя'
+        verbose_name_plural = 'Список карт пользователя'
         ordering = ('user',)
 
     def __str__(self):
-        return f'{self.card} в списке избранного пользователя {self.user}'
+        return f'{self.card} в списке карт пользователя {self.user}'

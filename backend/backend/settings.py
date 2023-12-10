@@ -1,20 +1,29 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_FILES_DIR = os.path.join(BASE_DIR, 'data')
+GROUP_FILES_DIR = os.path.join(DATA_FILES_DIR, 'group.csv')
 
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='some_secret_key')
 
-SECRET_KEY = 'django-insecure-#pz2&o-&b=q_&e&ws$a$hf-_^c2mv8g79b(xi1(vjntcz=dw3a'
+DEBUG = os.getenv('DEBUG', default=False)
 
-DEBUG = True
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'skidivay.acceleratorpracticum.ru',
+    '213.189.221.97',
+    'backend',
+]
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'skidivay.ddns.net', '80.87.107.140']
-
+CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000')]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -23,24 +32,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'sorl.thumbnail',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'django_filters',
     'api',
     'core',
     'users.apps.UsersConfig',
-    'phonenumber_field',
     'drf_yasg',
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
-
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,53 +73,50 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-"""DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}"""
-
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE'),
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432')
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': os.getenv('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
+        'USER': os.getenv('POSTGRES_USER', default='user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='password'),
+        'HOST': os.getenv('DB_HOST', default='127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', default=5432)
     }
 }
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
+
 AUTH_USER_MODEL = 'users.User'
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'users.passwordvalidators.NumberValidator',
+    },
+    {
+        'NAME': 'users.passwordvalidators.UppercaseValidator',
+    },
+    {
+        'NAME': 'users.passwordvalidators.LowercaseValidator',
+    },
 ]
-
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'skidyvaj@yandex.ru'
-EMAIL_HOST_PASSWORD = 'kfhsdosxgmugqcxa'
-EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-SERVER_EMAIL = EMAIL_HOST_USER
-EMAIL_ADMIN = EMAIL_HOST_USER
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 LANGUAGE_CODE = 'ru'
 
@@ -133,34 +133,50 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'users.authentication.CustomTokenAuthentication',
     ],
-}
-
-SIMPLE_JWT = {
-    # Устанавливаем срок жизни токена
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'EXCEPTION_HANDLER': 'api.exception_handler.custom_exception_handler',
 }
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'api.serializers.UserCreateSerializer',
-        'user': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
+        'user_create': 'api.serializers.CustomUserCreateSerializer',
+        'user': 'api.serializers.UserReadSerializer',
+        'current_user': 'api.serializers.UserReadSerializer',
+        'token_create': 'api.serializers.CustomTokenCreateSerializer',
+        'password_reset': 'api.serializers.CustomSendEmailResetPasswordSerializer',
+        'activation': 'api.serializers.CustomActivationSerializer',
     },
-
+    'EMAIL': {
+        "activation": "api.email.CustomActivationEmail",
+    },
     'PERMISSIONS': {
-        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
-        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        'user': ['djoser.permissions.CurrentUserOrAdmin'],
+        'activation': ['api.permissions.IsUserEmailOwner'],
     },
-    'HIDE_USERS': False,
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': False,
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_CONFRIMATION_EMAIL': False,
+    'HIDE_USERS': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'password_reset_confirm/{uid}/{token}',
 }
+
+# SendGrid settings
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# TODO убрать, после отладки отправления писем
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
+
+# TODO убрать на продакшене
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
