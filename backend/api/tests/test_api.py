@@ -341,9 +341,9 @@ class EndpointsTestCase(APITests):
 
         email = self.another_user.email
         url = reverse(
-            'api:card-detail',
+            'api:card-share',
             kwargs={'pk': f'{self.card_user_own.id}'}
-        ) + 'share/'
+        )
         response = self.auth_client.post(url, {'email': email}, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(UserCards.objects.filter(
@@ -363,9 +363,9 @@ class EndpointsTestCase(APITests):
         )
         email = self.another_user.email
         url = reverse(
-            'api:card-detail',
+            'api:card-share',
             kwargs={'pk': f'{self.card_user_own.id}'}
-        ) + 'share/'
+        )
         response = self.auth_client.post(url, {'email': email}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -373,9 +373,9 @@ class EndpointsTestCase(APITests):
         """Проверка невозможности поделиться картой с самим собой."""
         email_of_user_who_share = self.user.email
         url = reverse(
-            'api:card-detail',
+            'api:card-share',
             kwargs={'pk': f'{self.card_user_own.id}'}
-        ) + 'share/'
+        )
         response = self.auth_client.post(
             url,
             {'email': email_of_user_who_share},
@@ -387,9 +387,9 @@ class EndpointsTestCase(APITests):
         """Проверка возможности отправить приглашение на е-мейл."""
 
         url = reverse(
-            'api:card-detail',
+            'api:card-share',
             kwargs={'pk': f'{self.card_user_not_fav.id}'}
-        ) + 'share/'
+        )
         email = self.EMAIL_NOT_OF_A_USER
         response = self.auth_client.post(url, {'email': email}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
