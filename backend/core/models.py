@@ -174,6 +174,21 @@ class UserCards(models.Model):
         blank=True,
         default=False,
     )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата добавления карты',
+        auto_now_add=True,
+        blank=True,
+        null=True
+    )
+    shared_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shared',
+        verbose_name='Кто поделился картой',
+        blank=True,
+        null=True,
+        default=None
+    )
     usage_counter = models.PositiveBigIntegerField(
         verbose_name='Количество использований карты',
         default=0,
@@ -192,7 +207,7 @@ class UserCards(models.Model):
         )
         verbose_name = 'Карта пользователя'
         verbose_name_plural = 'Список карт пользователя'
-        ordering = ('user',)
+        ordering = ('-pub_date', 'user', 'card')
 
     def __str__(self):
         return f'{self.card} в списке карт пользователя {self.user}'

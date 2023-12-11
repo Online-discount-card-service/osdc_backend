@@ -380,7 +380,12 @@ class CardViewSet(viewsets.ModelViewSet):
             if UserCards.objects.filter(user=friend, card=card).exists():
                 message = ErrorMessage.card_already_shared(self, email)
                 raise serializers.ValidationError(message)
-            UserCards.objects.create(user=friend, card=card, owner=False)
+            UserCards.objects.create(
+                user=friend,
+                card=card,
+                shared_by=request.user,
+                owner=False
+            )
             message = Message.successful_sharing(self, email)
             return Response(
                 {'message': message},

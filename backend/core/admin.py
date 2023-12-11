@@ -83,6 +83,8 @@ class UserCardsAdmin(admin.ModelAdmin):
         'user',
         'card',
         'owner',
+        'pub_date',
+        'shared_by',
         'usage_counter'
     )
     empty_value_display = '-пусто-'

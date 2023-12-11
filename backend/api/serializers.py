@@ -101,10 +101,18 @@ class CardEditSerializer(serializers.ModelSerializer):
         return CardSerializer(instance).data
 
 
+class SharedBySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'name', 'email')
+
+
 class CardsListSerializer(serializers.ModelSerializer):
     """Сериализатор списка карт пользователя."""
 
     card = CardSerializer()
+    shared_by = SharedBySerializer()
 
     class Meta:
         model = UserCards
