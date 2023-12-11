@@ -7,6 +7,7 @@ from users.models import User
 class CardsInline(admin.TabularInline):
     model = UserCards
     extra = 1
+    fk_name = 'user'
 
 
 @admin.register(User)
