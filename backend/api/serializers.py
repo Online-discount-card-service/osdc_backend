@@ -186,6 +186,7 @@ class UserReadSerializer(UserSerializer):
             'email',
             'name',
             'phone_number',
+            'is_active',
         )
 
 
