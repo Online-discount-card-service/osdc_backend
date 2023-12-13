@@ -1,5 +1,3 @@
-# from difflib import SequenceMatcher
-
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import NumericPasswordValidator
 from django.core.exceptions import ValidationError
