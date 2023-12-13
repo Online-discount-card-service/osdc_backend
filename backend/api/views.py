@@ -65,6 +65,21 @@ class CustomUserViewSet(UserViewSet):
         if serializer.is_valid(raise_exception=True):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @swagger_auto_schema(
+        method='post',
+        request_body=openapi.Schema(type=openapi.TYPE_OBJECT),
+        operation_description=(
+            'Повторная отправка письма для подтверждения почты.'),
+        responses={
+            204: openapi.Response(
+                'Пустой ответ в случае успешного выполнения.'),
+            400: openapi.Response(
+                f'Подтверждение не требуется или '
+                f'{ErrorMessage.EMAIL_ALREADY_ACTIVATED}'
+            ),
+            401: openapi.Response('Unauthorized'),
+        },
+    )
     @action(
         ['post'],
         detail=False,
