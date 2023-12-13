@@ -6,6 +6,7 @@ MAX_LENGTH_BARCODE_NUMBER = 256
 MAX_LENGTH_COLOR = 16
 MAX_LENGTH_ENCODING_TYPE = 30
 MAX_NUM_CARD_USE_BY_USER = None
+FIELD_MASK = r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$"
 CODE128 = 'code128'
 CODE39 = 'code39'
 UPC_A = 'upc-a'

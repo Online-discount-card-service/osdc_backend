@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from core.consts import ErrorMessage
+from core.consts import FIELD_MASK, ErrorMessage
 from users.consts import LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 
@@ -52,7 +52,7 @@ class User(AbstractUser):
         blank=False,
         max_length=MAX_LENGTH_NAME,
         validators=[RegexValidator(
-            r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
+            FIELD_MASK,
             message=ErrorMessage.NAME_INCORRECT,
         )]
     )
