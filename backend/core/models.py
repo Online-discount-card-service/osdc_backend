@@ -5,6 +5,7 @@ from django.db import models
 from .consts import (
     EAN_13,
     ENCODING_TYPE,
+    MAX_LENGTH_BARCODE_NUMBER,
     MAX_LENGTH_CARD_NAME,
     MAX_LENGTH_CARD_NUMBER,
     MAX_LENGTH_COLOR,
@@ -117,7 +118,7 @@ class Card(models.Model):
         blank=True
     )
     barcode_number = models.CharField(
-        max_length=MAX_LENGTH_CARD_NUMBER,
+        max_length=MAX_LENGTH_BARCODE_NUMBER,
         verbose_name='Номер штрих-кода',
         validators=[RegexValidator(
             regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
