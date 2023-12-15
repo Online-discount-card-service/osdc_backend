@@ -126,7 +126,7 @@ class Card(models.Model):
         max_length=MAX_LENGTH_BARCODE_NUMBER,
         verbose_name='Номер штрих-кода',
         validators=[RegexValidator(
-            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
+            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,256}$',
             message=ErrorMessage.INCORRECT_BARCODE,
         )],
         blank=True
