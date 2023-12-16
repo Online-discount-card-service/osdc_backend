@@ -5,7 +5,7 @@ from django.db import models
 from .consts import (
     EAN_13,
     ENCODING_TYPE,
-    FIELD_MASK,
+    FIELD_MASK_WITH_DIGITS,
     MAX_LENGTH_BARCODE_NUMBER,
     MAX_LENGTH_CARD_NAME,
     MAX_LENGTH_CARD_NUMBER,
@@ -28,8 +28,8 @@ class Group(models.Model):
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
         validators=[RegexValidator(
-            FIELD_MASK,
-            message=ErrorMessage.NAME_INCORRECT,
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
         )]
     )
 
@@ -49,8 +49,8 @@ class Shop(models.Model):
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название магазина',
         validators=[RegexValidator(
-            FIELD_MASK,
-            message=ErrorMessage.NAME_INCORRECT,
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
         )]
     )
     group = models.ManyToManyField(
@@ -93,8 +93,8 @@ class Card(models.Model):
         blank=False,
         verbose_name='Название карты',
         validators=[RegexValidator(
-            FIELD_MASK,
-            message=ErrorMessage.NAME_INCORRECT,
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
         )]
     )
     shop = models.ForeignKey(
