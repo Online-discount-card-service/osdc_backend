@@ -124,8 +124,8 @@ class Message:
             f'но мы направили ему приглашение.'
         )
 
-    def successful_sharing(self, email):
+    def successful_sharing(self, email, card):
         return (
-            f'Вы успешно поделились картой '
-            f'с пользователем, чья почта {email}!'
+            f'Карта {card.name} отправлена '
+            f'пользователю {email}'
         )

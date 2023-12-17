@@ -19,7 +19,7 @@ from core.consts import (
     ErrorMessage,
 )
 from core.models import Card, Group, Shop, UserCards
-from users.consts import MIN_PASSWORD_LENGTH  # MAX_SIMILARITY
+from users.consts import MIN_PASSWORD_LENGTH
 from users.models import User
 from users.passwordvalidators import (
     LowercaseValidator,
@@ -208,20 +208,12 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(
         min_length=MIN_PASSWORD_LENGTH,
-        required=True,
+        required=False,
     )
 
     class Meta:
         model = User
         fields = ('email', 'password')
-
-    # def validate(self, data):
-        # password = data.get('password')
-        # email = data.get('email')
-        # sequence_match = SequenceMatcher(a=password.lower(), b=email.lower())
-        # if sequence_match.quick_ratio() > MAX_SIMILARITY:
-        #     raise serializers.ValidationError(ErrorMessage.TOO_SIMILAR_DATA)
-        # return super(UserPreCheckSerializer, self).validate(data)
 
     def validate_password(self, data):
         errors = []
@@ -231,11 +223,6 @@ class UserPreCheckSerializer(serializers.ModelSerializer):
             UppercaseValidator,
             LowercaseValidator
         )
-        # try:
-        #     validator = CommonPasswordValidator()
-        #     validator.validate(password=data, user=None)
-        # except ValidationError as error:
-        #      errors.append(error)
         for validator in password_validators:
             try:
                 validator.validate(self, password=data, user=None)

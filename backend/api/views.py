@@ -427,7 +427,7 @@ class CardViewSet(viewsets.ModelViewSet):
                 shared_by=request.user,
                 owner=False
             )
-            message = Message.successful_sharing(self, email)
+            message = Message.successful_sharing(self, email, card)
             return Response(
                 {'message': message},
                 status=status.HTTP_201_CREATED,
