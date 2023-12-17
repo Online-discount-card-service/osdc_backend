@@ -116,6 +116,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'users.passwordvalidators.LowercaseValidator',
     },
+    {
+        'NAME': 'users.passwordvalidators.OnlyASCIIValidator',
+    },
+    {
+        'NAME': 'users.passwordvalidators.MaximumLengthValidator',
+    }
 ]
 
 LANGUAGE_CODE = 'ru'

@@ -5,6 +5,8 @@ from django.db import models
 from .consts import (
     EAN_13,
     ENCODING_TYPE,
+    FIELD_MASK_WITH_DIGITS,
+    MAX_LENGTH_BARCODE_NUMBER,
     MAX_LENGTH_CARD_NAME,
     MAX_LENGTH_CARD_NUMBER,
     MAX_LENGTH_COLOR,
@@ -25,6 +27,10 @@ class Group(models.Model):
     name = models.CharField(
         max_length=MAX_LENGTH_GROUP_NAME,
         verbose_name='Название категории',
+        validators=[RegexValidator(
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
+        )]
     )
 
     class Meta:
@@ -43,9 +49,9 @@ class Shop(models.Model):
         max_length=MAX_LENGTH_SHOP_NAME,
         verbose_name='Название магазина',
         validators=[RegexValidator(
-            r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
-            message=ErrorMessage.INCORRECT_SHOP_TITLE,
-        )],
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
+        )]
     )
     group = models.ManyToManyField(
         Group,
@@ -87,9 +93,9 @@ class Card(models.Model):
         blank=False,
         verbose_name='Название карты',
         validators=[RegexValidator(
-            r"^[0-9a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
-            message=ErrorMessage.INCORRECT_CARD_TITLE,
-        )],
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
+        )]
     )
     shop = models.ForeignKey(
         Shop,
@@ -117,10 +123,10 @@ class Card(models.Model):
         blank=True
     )
     barcode_number = models.CharField(
-        max_length=MAX_LENGTH_CARD_NUMBER,
+        max_length=MAX_LENGTH_BARCODE_NUMBER,
         verbose_name='Номер штрих-кода',
         validators=[RegexValidator(
-            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,40}$',
+            regex=r'^[0-9A-Za-zА-Яа-я\ \-_]{1,256}$',
             message=ErrorMessage.INCORRECT_BARCODE,
         )],
         blank=True

@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from djoser.conf import settings as djoser_settings
 from djoser.permissions import CurrentUserOrAdmin
 from djoser.views import TokenDestroyView, UserViewSet
 from drf_yasg import openapi
@@ -62,6 +64,45 @@ class CustomUserViewSet(UserViewSet):
         serializer = UserPreCheckSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        method='post',
+        request_body=openapi.Schema(type=openapi.TYPE_OBJECT),
+        operation_description=(
+            'Повторная отправка письма для подтверждения почты.'),
+        responses={
+            204: openapi.Response(
+                'Пустой ответ в случае успешного выполнения.'),
+            400: openapi.Response(
+                f'Подтверждение не требуется или '
+                f'{ErrorMessage.EMAIL_ALREADY_ACTIVATED}'
+            ),
+            401: openapi.Response('Unauthorized'),
+        },
+    )
+    @action(
+        ['post'],
+        detail=False,
+        url_path='resend_activation',
+        name='resend-activation',
+    )
+    def resend_activation(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        if not settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if request.user.is_active:
+            raise serializers.ValidationError(
+                ErrorMessage.EMAIL_ALREADY_ACTIVATED)
+
+        if request.user.email:
+            context = {'user': request.user}
+            to = [request.user.email]
+            djoser_settings.EMAIL.activation(self.request, context).send(to)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CustomTokenDestroyView(TokenDestroyView):

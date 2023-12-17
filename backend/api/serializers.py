@@ -1,5 +1,3 @@
-# from difflib import SequenceMatcher
-
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import NumericPasswordValidator
 from django.core.exceptions import ValidationError
@@ -14,7 +12,12 @@ from djoser.serializers import (
 )
 from rest_framework import serializers
 
-from core.consts import MAX_NUM_CARD_USE_BY_USER, ErrorMessage
+from core.consts import (
+    FIELD_MASK_WITH_DIGITS,
+    MAX_LENGTH_SHOP_NAME,
+    MAX_NUM_CARD_USE_BY_USER,
+    ErrorMessage,
+)
 from core.models import Card, Group, Shop, UserCards
 from users.consts import MIN_PASSWORD_LENGTH  # MAX_SIMILARITY
 from users.models import User
@@ -122,7 +125,13 @@ class CardsListSerializer(serializers.ModelSerializer):
 class ShopCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания магазина с возможностью добавить категории."""
 
-    name = serializers.CharField()
+    name = serializers.CharField(
+        max_length=MAX_LENGTH_SHOP_NAME,
+        validators=[RegexValidator(
+            FIELD_MASK_WITH_DIGITS,
+            message=ErrorMessage.TITLE_INCORRECT,
+        )]
+    )
     group = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=False,
