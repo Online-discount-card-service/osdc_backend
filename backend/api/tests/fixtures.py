@@ -107,7 +107,11 @@ class APITests(APITestCase):
     def setUp(self):
         self.guest_client = APIClient()
         self.auth_client = APIClient()
+        self.inactive_auth_client = APIClient()
         self.auth_client.force_authenticate(user=self.user)
+        self.inactive_auth_client.force_authenticate(
+            user=self.unactivated_user
+        )
 
     @classmethod
     def tearDownClass(cls):

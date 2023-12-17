@@ -22,6 +22,7 @@ from .serializers import (
     CardSerializer,
     CardShopCreateSerializer,
     CardsListSerializer,
+    CustomUidAndTokenSerializer,
     EmailSerializer,
     GroupSerializer,
     ShopCreateSerializer,
@@ -102,6 +103,15 @@ class CustomUserViewSet(UserViewSet):
             to = [request.user.email]
             djoser_settings.EMAIL.activation(self.request, context).send(to)
 
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(["post"], detail=False)
+    def activation(self, request, *args, **kwargs):
+        serializer = CustomUidAndTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        user.is_active = True
+        user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

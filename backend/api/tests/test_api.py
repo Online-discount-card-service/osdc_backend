@@ -3,6 +3,7 @@ from django.core import mail
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 from core.models import Card, UserCards
 
@@ -465,15 +466,17 @@ class CustomizedDjoserTestCase(APITests):
 
     def test_unactivated_user_can_login(self):
         """Неактивированный пользователь может залогиниться."""
+
         response = self.client.post(
-            '/api/v1/auth/token/login/',
+            reverse('api:login'),
             {'email': self.unactivated_user.email,
              'password': 'TestPass2'}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_password_recovery(self):
-        """ользователь может запросить восстановление пароля."""
+        """Пользователь может запросить восстановление пароля."""
+
         users_phone = self.user.phone_number
         response = self.client.post(
             reverse('api:user-list') + 'reset_password/',
@@ -489,12 +492,30 @@ class CustomizedDjoserTestCase(APITests):
             'Не удалось отправить запрос на смену пароля.'
         )
 
+    def check_activation(self, mail_context, email):
+        uid = mail_context['uid']
+        token = mail_context['token']
+        user = User.objects.get(email=email)
+        unactivated_client = APIClient()
+        unactivated_client.force_authenticate(user=user)
+        response = unactivated_client.post(
+            reverse('api:user-activation'),
+            {
+                'uid': uid,
+                'token': token
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertTrue(user.is_active, 'Не удалось активировать почту.')
+
     def test_email_activation(self):
         """Пользователь получает email для активации."""
+
+        email = 'testemail@test.ru'
         response = self.client.post(
             reverse('api:user-list'),
             {
-                'email': 'testemail@test.ru',
+                'email': email,
                 'name': 'test',
                 'password': 'Password1',
                 'phone_number': '9123456789'
@@ -507,6 +528,15 @@ class CustomizedDjoserTestCase(APITests):
             'Не удалось отправить письмо для активации.'
         )
         self.assertIn('testemail@test.ru', mail.outbox[0].recipients())
-        context = mail.outbox[0].get_context_data()
-        self.assertIn('uid', context)
-        self.assertIn('token', context)
+        mail_context = mail.outbox[0].get_context_data()
+        self.assertIn('uid', mail_context)
+        self.assertIn('token', mail_context)
+        self.check_activation(mail_context=mail_context, email=email)
+
+    def test_user_can_activate_email(self):
+        """Пользователь может активировать почту."""
+
+        self.inactive_auth_client.post(reverse('api:user-resend-activation'))
+        mail_context = mail.outbox[0].get_context_data()
+        email = self.unactivated_user.email
+        self.check_activation(mail_context=mail_context, email=email)
