@@ -152,7 +152,8 @@ DJOSER = {
         'activation': 'api.serializers.CustomActivationSerializer',
     },
     'EMAIL': {
-        "activation": "api.email.CustomActivationEmail",
+        'activation': 'api.email.CustomActivationEmail',
+        'password_reset': 'api.email.CustomPasswordResetEmail'
     },
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],

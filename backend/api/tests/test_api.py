@@ -401,7 +401,7 @@ class EndpointsTestCase(APITests):
             'Не удалось отправить письмо-приглашение.'
         )
         self.assertIn(
-            'С вами хотят поделитсья скидочной картой на сайте',
+            'С Вами поделились картой!',
             mail.outbox[0].subject
         )
         self.assertIn(email, mail.outbox[0].recipients())
