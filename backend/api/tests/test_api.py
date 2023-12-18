@@ -479,7 +479,7 @@ class CustomizedDjoserTestCase(APITests):
 
         users_phone = self.user.phone_number
         response = self.client.post(
-            reverse('api:user-list') + 'reset_password/',
+            reverse('api:user-reset-password'),
             {
                 'email': self.user.email,
                 'phone_last_digits': users_phone[-4:]
@@ -506,6 +506,7 @@ class CustomizedDjoserTestCase(APITests):
             }
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        user.refresh_from_db()
         self.assertTrue(user.is_active, 'Не удалось активировать почту.')
 
     def test_email_activation(self):
@@ -527,7 +528,7 @@ class CustomizedDjoserTestCase(APITests):
             1,
             'Не удалось отправить письмо для активации.'
         )
-        self.assertIn('testemail@test.ru', mail.outbox[0].recipients())
+        self.assertIn(email, mail.outbox[0].recipients())
         mail_context = mail.outbox[0].get_context_data()
         self.assertIn('uid', mail_context)
         self.assertIn('token', mail_context)
