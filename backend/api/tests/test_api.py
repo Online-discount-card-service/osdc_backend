@@ -3,6 +3,7 @@ from django.core import mail
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 from core.models import Card, UserCards
 
@@ -79,6 +80,7 @@ class EndpointsTestCase(APITests):
 
         expected_fields = [
             'card', 'owner', 'favourite', 'usage_counter',
+            'shared_by', 'pub_date'
         ]
         expected_card_fields = [
             'id', 'shop', 'image', 'name', 'pub_date', 'card_number',
@@ -283,7 +285,7 @@ class EndpointsTestCase(APITests):
                 kwargs={'pk': self.card.pk}
             ),
             {
-                'usage_counter': "157",
+                'usage_counter': '157',
             })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
@@ -388,7 +390,7 @@ class EndpointsTestCase(APITests):
 
         url = reverse(
             'api:card-share',
-            kwargs={'pk': f'{self.card_user_not_fav.id}'}
+            kwargs={'pk': f'{self.card_user_own.id}'}
         )
         email = self.EMAIL_NOT_OF_A_USER
         response = self.auth_client.post(url, {'email': email}, format='json')
@@ -399,12 +401,12 @@ class EndpointsTestCase(APITests):
             'Не удалось отправить письмо-приглашение.'
         )
         self.assertIn(
-            "С вами хотят поделитсья скидочной картой на сайте",
+            'С вами хотят поделитсья скидочной картой на сайте',
             mail.outbox[0].subject
         )
         self.assertIn(email, mail.outbox[0].recipients())
         context = mail.outbox[0].get_context_data()
-        self.assertEqual(context['card'], self.card_user_not_fav)
+        self.assertEqual(context['card'], self.card_user_own)
 
 
 class ShopEditTestCase(APIShopEditTests):
@@ -457,3 +459,85 @@ class ShopEditTestCase(APIShopEditTests):
             }
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class CustomizedDjoserTestCase(APITests):
+    """Проверка кастомизированных ручек Djoser."""
+
+    def test_unactivated_user_can_login(self):
+        """Неактивированный пользователь может залогиниться."""
+
+        response = self.client.post(
+            reverse('api:login'),
+            {'email': self.unactivated_user.email,
+             'password': 'TestPass2'}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_password_recovery(self):
+        """Пользователь может запросить восстановление пароля."""
+
+        users_phone = self.user.phone_number
+        response = self.client.post(
+            reverse('api:user-reset-password'),
+            {
+                'email': self.user.email,
+                'phone_last_digits': users_phone[-4:]
+            },
+            format='json'
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT,
+            'Не удалось отправить запрос на смену пароля.'
+        )
+
+    def check_activation(self, mail_context, email):
+        uid = mail_context['uid']
+        token = mail_context['token']
+        user = User.objects.get(email=email)
+        unactivated_client = APIClient()
+        unactivated_client.force_authenticate(user=user)
+        response = unactivated_client.post(
+            reverse('api:user-activation'),
+            {
+                'uid': uid,
+                'token': token
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        user.refresh_from_db()
+        self.assertTrue(user.is_active, 'Не удалось активировать почту.')
+
+    def test_email_activation(self):
+        """Пользователь получает email для активации."""
+
+        email = 'testemail@test.ru'
+        response = self.client.post(
+            reverse('api:user-list'),
+            {
+                'email': email,
+                'name': 'test',
+                'password': 'Password1',
+                'phone_number': '9123456789'
+            }
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            len(mail.outbox),
+            1,
+            'Не удалось отправить письмо для активации.'
+        )
+        self.assertIn(email, mail.outbox[0].recipients())
+        mail_context = mail.outbox[0].get_context_data()
+        self.assertIn('uid', mail_context)
+        self.assertIn('token', mail_context)
+        self.check_activation(mail_context=mail_context, email=email)
+
+    def test_user_can_activate_email(self):
+        """Пользователь может активировать почту."""
+
+        self.inactive_auth_client.post(reverse('api:user-resend-activation'))
+        mail_context = mail.outbox[0].get_context_data()
+        email = self.unactivated_user.email
+        self.check_activation(mail_context=mail_context, email=email)

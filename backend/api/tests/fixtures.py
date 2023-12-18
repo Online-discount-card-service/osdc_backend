@@ -73,7 +73,10 @@ class APITests(APITestCase):
                 phone_number=f'+7999999999{user_num}',
             )
         cls.user = User.objects.order_by().first()
+        cls.user.is_active = True
         cls.another_user = User.objects.order_by()[1]
+        cls.unactivated_user = User.objects.order_by()[2]
+        cls.unactivated_user.is_active = False
 
         for card_num in range(cls.CARDS_USER_HAVE):
             UserCards.objects.create(
@@ -104,7 +107,11 @@ class APITests(APITestCase):
     def setUp(self):
         self.guest_client = APIClient()
         self.auth_client = APIClient()
+        self.inactive_auth_client = APIClient()
         self.auth_client.force_authenticate(user=self.user)
+        self.inactive_auth_client.force_authenticate(
+            user=self.unactivated_user
+        )
 
     @classmethod
     def tearDownClass(cls):
