@@ -1,13 +1,13 @@
 from djoser import utils
 from djoser.conf import settings
-from djoser.email import ActivationEmail
+from djoser.email import ActivationEmail, PasswordResetEmail
 from templated_mail.mail import BaseEmailMessage
 
 from users.tokens import custom_token_generator
 
 
 class CustomActivationEmail(ActivationEmail):
-    template_name = 'email/activation.html'
+    template_name = 'email/custom_activation.html'
 
     def get_context_data(self):
         context = super().get_context_data()
@@ -25,3 +25,7 @@ class InvitationEmail(BaseEmailMessage):
     def get_context_data(self):
         context = super().get_context_data()
         return context
+
+
+class CustomPasswordResetEmail(PasswordResetEmail):
+    template_name = "email/custom_password_reset.html"

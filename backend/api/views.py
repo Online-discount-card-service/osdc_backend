@@ -408,7 +408,10 @@ class CardViewSet(viewsets.ModelViewSet):
             if not User.objects.filter(email=email).exists():
                 InvitationEmail(
                     self.request,
-                    context={'card': card}
+                    context={
+                        'card': card,
+                        'user': request.user
+                    }
                 ).send(to=[f'{email}'])
                 message = Message.invitation_message_create(self, email=email)
                 return Response(
