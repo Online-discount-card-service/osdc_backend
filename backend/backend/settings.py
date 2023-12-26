@@ -17,9 +17,8 @@ DEBUG = os.getenv('DEBUG', default=False)
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'skidivay.acceleratorpracticum.ru',
-    '213.189.221.97',
     'backend',
+    os.getenv('NGINX_HOST'),
 ]
 
 CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
