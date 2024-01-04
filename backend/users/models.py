@@ -4,8 +4,9 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from core.consts import ErrorMessage
+from core.consts import FIELD_MASK, ErrorMessage
 from users.consts import LEN_NUMBER, MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
+from users.validators import no_cirrylic_email
 
 
 class CustomUserManager(BaseUserManager):
@@ -44,6 +45,7 @@ class User(AbstractUser):
         error_messages={
             'unique': _(f'{ErrorMessage.NONUNIQUE_EMAIL}')
         },
+        validators=[no_cirrylic_email],
         max_length=MAX_LENGTH_EMAIL
     )
     name = models.CharField(
@@ -52,7 +54,7 @@ class User(AbstractUser):
         blank=False,
         max_length=MAX_LENGTH_NAME,
         validators=[RegexValidator(
-            r"^[a-zA-Zа-яА-ЯёЁ\ \!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-=|\"']+$",
+            FIELD_MASK,
             message=ErrorMessage.NAME_INCORRECT,
         )]
     )

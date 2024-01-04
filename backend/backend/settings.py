@@ -17,9 +17,8 @@ DEBUG = os.getenv('DEBUG', default=False)
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'skidivay.acceleratorpracticum.ru',
-    '213.189.221.97',
     'backend',
+    os.getenv('NGINX_HOST'),
 ]
 
 CSRF_TRUSTED = os.getenv('CSRF_TRUSTED')
@@ -95,15 +94,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 
 AUTH_USER_MODEL = 'users.User'
 AUTH_PASSWORD_VALIDATORS = [
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    # },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    # },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
@@ -116,6 +109,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'users.passwordvalidators.LowercaseValidator',
     },
+    {
+        'NAME': 'users.passwordvalidators.OnlyASCIIValidator',
+    },
+    {
+        'NAME': 'users.passwordvalidators.MaximumLengthValidator',
+    }
 ]
 
 LANGUAGE_CODE = 'ru'
@@ -152,7 +151,8 @@ DJOSER = {
         'activation': 'api.serializers.CustomActivationSerializer',
     },
     'EMAIL': {
-        "activation": "api.email.CustomActivationEmail",
+        'activation': 'api.email.CustomActivationEmail',
+        'password_reset': 'api.email.CustomPasswordResetEmail'
     },
     'PERMISSIONS': {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
@@ -170,12 +170,11 @@ DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 
-# TODO убрать, после отладки отправления писем
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
+if os.getenv('EMAIL_DEBUG', default=False):
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
 
 # TODO убрать на продакшене
-# CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',

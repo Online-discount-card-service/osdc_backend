@@ -1,0 +1,6 @@
+DJANGO_SECRET_KEY='django-big-secret'
+DEBUG=True
+EMAIL_DEBUG=True
+
+SENDGRID_API_KEY='SG.api-key'
+SENDGRID_FROM_EMAIL='no-reply@skidivay.ru'

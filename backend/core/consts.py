@@ -1,10 +1,15 @@
 MAX_LENGTH_CARD_NAME = 30
-MAX_LENGTH_GROUP_NAME = 20
+MAX_LENGTH_GROUP_NAME = 30
 MAX_LENGTH_SHOP_NAME = 30
 MAX_LENGTH_CARD_NUMBER = 40
+MAX_LENGTH_BARCODE_NUMBER = 256
 MAX_LENGTH_COLOR = 16
 MAX_LENGTH_ENCODING_TYPE = 30
 MAX_NUM_CARD_USE_BY_USER = None
+FIELD_MASK = r"^[A-Za-zА-ЯЁа-яё\@\!\#\$\%\&\'\*\+\/\=\?\^\_\`\{\|\}\~\-\.\ ]+$"
+FIELD_MASK_WITH_DIGITS = (
+    r"^[A-Za-zА-ЯЁа-яё\d\@\!\#\$\%\&\'\*\+\/\=\?\^\_\`\{\|\}\~\-\.\ ]{1,30}$"
+)
 CODE128 = 'code128'
 CODE39 = 'code39'
 UPC_A = 'upc-a'
@@ -37,6 +42,7 @@ class ErrorMessage:
         429: 'Слишком много запросов.',
         431: 'Заголовок слишком большой.',
     }
+    CANNOT_SHARE_WITH_SELF = 'Вы не можете поделиться картой с самим собой.'
     CARD_HAS_NO_BARCODE_OR_NUMBER = (
         'Необходимо указать номер карты и/или штрих-кода.'
     )
@@ -57,8 +63,14 @@ class ErrorMessage:
     INCORRECT_CARD_TITLE = (
         'Название может содержать только буквы, цифры, пробелы и спецсимволы.'
     )
+    INCORRECT_EMAIL = 'Введен некорректный email'
     INCORRECT_SHOP_TITLE = (
         'Название может содержать только буквы, цифры, пробелы и спецсимволы.'
+    )
+    INCORRECT_PASSWORD = (
+        'Пароль может содержать только латиницу и должен иметь хотя бы одну '
+        'заглавную, одну строчную буквы и одну цифру. '
+        'Минимальная длина - 8 знаков.'
     )
     INCORRECT_UID = 'Неверный формат uid.'
     INCORRECT_USAGE_STATISTICS = (
@@ -80,6 +92,7 @@ class ErrorMessage:
     PASSWORD_NO_UPPER_CASE = (
         'Пароль должен содержать как минимум одну большую букву, A-Z или А-Я.'
     )
+    PASSWORD_TOO_LONG = 'Максимальная длина - 256 знаков.'
     PHONE_LAST_DIGITS_ARE_NOT_DIGITS = (
         'Здесь должны быть последние 4 цифры телефона.'
     )
@@ -89,7 +102,16 @@ class ErrorMessage:
         'У суперпользователя должно быть is_superuser=True.'
     )
     TELEPHONE_NUMBER_INCORRECT = 'Номер телефона 10 цифр после +7.'
+    TITLE_INCORRECT = (
+        'Имя может содержать только буквы, цифры, пробелы и спецсимволы.'
+    )
     TOO_SIMILAR_DATA = 'Пароль слишком похож на е-мейл.'
+
+    def card_already_shared(self, email):
+        return (
+            f'У пользователя с е-мейл {email} '
+            f'уже есть данная карта.'
+        )
 
 
 class Message:
@@ -102,8 +124,8 @@ class Message:
             f'но мы направили ему приглашение.'
         )
 
-    def successful_sharing(self, email):
+    def successful_sharing(self, email, card):
         return (
-            f'Вы успешно поделились картой '
-            f'с пользователем, чья почта {email}!'
+            f'Карта {card.name} отправлена '
+            f'пользователю {email}'
         )
