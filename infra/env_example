@@ -1,5 +1,6 @@
 DJANGO_SECRET_KEY=django-insecure-1234567890
 DEBUG=False
+EMAIL_DEBUG=False
 CSRF_TRUSTED=your_host
 CSRF_TRUSTED_ORIGINS=http://your_host
 

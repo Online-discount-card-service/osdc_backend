@@ -170,12 +170,11 @@ DEFAULT_FROM_EMAIL = os.getenv('SENDGRID_FROM_EMAIL')
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 
-# TODO убрать, после отладки отправления писем
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
+if os.getenv('EMAIL_DEBUG', default=False):
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = os.path.join(STATIC_ROOT, 'sent_emails')
 
 # TODO убрать на продакшене
-# CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
